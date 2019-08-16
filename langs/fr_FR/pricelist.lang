@@ -1,0 +1,58 @@
+Module104714Name = Grilles Tarifaires
+Module104714Desc = Description Grilles Tarifaires
+
+ATMAbout = Ce module a été développé par <a href="http://www.atm-consulting.fr" target="_blank">ATM Consulting</a><br>Vous pouvez retrouver la documentation sur notre <a href="http://wiki.atm-consulting.fr/index.php/Accueil" target="_blank">wiki</a><br><br>Pour toute question technique ou retour, contactez-nous sur <a href="mailto:support@atm-consulting.fr">support@atm-consulting.fr</a><br><br>Pour toute question commerciale, contactez-nous sur <a href="mailto:contact@atm-consulting.fr">contact@atm-consulting.fr</a> ou au +33 9 77 19 50 70<br><br>Retrouvez nos autres modules sur <a href="http://www.dolistore.com/search.php?orderby=position&orderway=desc&search_query=atm&submit_search=Rechercher" target="_blank">Dolistore</a>
+
+pricelistSetup = Configuration du module Grilles Tarifaires
+pricelistAbout = A propos du module Grilles Tarifaires
+
+pricelist=pricelist
+AbricotNeedUpdate=Le module abricot doit être mis à jour
+
+# SETUP
+ParamLabel=Nom du paramètre
+ParamDesc=Une description si besoin
+ParamHelp=Le contenu de l'aide
+
+# MENU
+TopMenupricelist=Grille Tarifaire
+
+# STATUS
+pricelistStatusCanceled=Abandonnée (fermée)
+pricelistStatusDraft=Brouillon (à valider)
+pricelistStatusValidated=Validée (à accepter)
+pricelistStatusRefused=Refusée (fermée)
+pricelistStatusAccepted=Acceptée (fermée)
+
+pricelistStatusShortCanceled=Abandonnée
+pricelistStatusShortDraft=Brouillon
+pricelistStatusShortValidated=Validée
+pricelistStatusShortRefused=Refusée
+pricelistStatusShortAccepted=Acceptée
+
+# LIST
+pricelistList=Liste pricelist
+Nopricelist=(vide)
+
+# CARD
+Newpricelist=Création pricelist
+pricelistCard=Fiche pricelist
+
+pricelistModify=Modifier
+pricelistClone=Cloner
+pricelistValid=Valider
+pricelistAccept=Accepter
+pricelistRefuse=Refuser
+pricelistReopen=Rouvrir
+pricelistCancel=Abandonner
+pricelistDelete=Supprimer
+
+ConfirmValidatepricelistTitle=Confirmation d'activation
+ConfirmValidatepricelistBody=Souhaitez-vous vraiment activer cette fiche pricelist %s ?
+
+ConfirmDeletepricelistTitle=Confirmation de suppression
+ConfirmDeletepricelistBody=Souhaitez-vous vraiment supprimer cette fiche pricelist %s ?
+
+# Massaction
+ChangePrice=Augmenter le prix de %s&#x25;
+PriceListeAugmentationMassValue=Augmentation en masse (en pourcentage)
