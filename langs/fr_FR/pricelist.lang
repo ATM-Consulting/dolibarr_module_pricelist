@@ -56,3 +56,6 @@ ConfirmDeletepricelistBody=Souhaitez-vous vraiment supprimer cette fiche priceli
 # Massaction
 ChangePrice=Augmenter le prix de %s&#x25;
 PriceListeAugmentationMassValue=Augmentation en masse (en pourcentage)
+
+
+MassActionChangePrice=Augmentation du prix de %s&#x25;

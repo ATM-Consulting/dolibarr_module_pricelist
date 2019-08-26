@@ -303,11 +303,14 @@ class modpricelist extends DolibarrModules
 	 */
 	public function init($options = '')
 	{
+		global $db;
 		$sql = array();
 
 		define('INC_FROM_DOLIBARR', true);
 
 		require dol_buildpath('/pricelist/script/create-maj-base.php');
+
+		dolibarr_set_const($db,'PRICELISTPOURCENTAGEMASSACTION','20');
 
 		$result=$this->_load_tables('/pricelist/sql/');
 

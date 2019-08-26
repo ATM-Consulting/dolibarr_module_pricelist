@@ -101,11 +101,22 @@ class Actionspricelist
 			if($massaction == 'changePrice')
 			{
 				dol_include_once('abricot/includes/class/class.seedobject.php');
+				dol_include_once('comm/action/class/actioncomm.class.php');
+				$event = new ActionComm($db);
 				foreach ($parameters['toselect'] as $selectId){
+
 					$object->fetch($selectId);
 					$augmentation = 1+($conf->global->PRICELISTPOURCENTAGEMASSACTION/100);
 					$object->updatePrice($object->price*$augmentation, 'HT', $user);
-					//TODO add log truc machin
+					$event->userownerid = $user->id;
+					$event->fk_element = $selectId;
+					$event->elementtype = $object->element;
+					$event->type_code = 'AC_OTH_AUTO';
+					$event->label = $langs->trans('MassActionChangePrice',$conf->global->PRICELISTPOURCENTAGEMASSACTION);
+					$event->percentage = '-1';
+					$event->datep = dol_now();
+
+					$event->create($user);
 				}
 			}
 		}
