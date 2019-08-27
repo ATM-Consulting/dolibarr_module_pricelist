@@ -70,7 +70,7 @@ class modpricelist extends DolibarrModules
 		$this->picto='pricelist@pricelist';
 
 		$this->module_parts = array(
-			'hooks' => array('data'=>array('main')
+			'hooks' => array('data'=>array('main','formAddObjectLine')
 			)
 		);
 
@@ -313,6 +313,15 @@ class modpricelist extends DolibarrModules
 		dolibarr_set_const($db,'PRICELISTPOURCENTAGEMASSACTION','20');
 
 		$result=$this->_load_tables('/pricelist/sql/');
+
+		$extrafields = new ExtraFields($db);
+
+		$result = $extrafields->addExtraField('fact_desc', 'Description Facture', 'html', 101, 1024, 'product');
+		$result = $extrafields->addExtraField('dev_desc', 'Description Devis', 'html', 102, 1024, 'product');
+		$result = $extrafields->addExtraField('comm_desc', 'Description Commande', 'html', 103, 1024, 'product');
+		$result = $extrafields->addExtraField('pl_desc', 'Description Grille Tarifaire', 'html', 104, 1024, 'product');
+
+		//FOR HOOK formAddObjectLine
 
 		return $this->_init($sql, $options);
 	}

@@ -121,6 +121,11 @@ class Actionspricelist
 			}
 		}
 
+
+		if (strpos($parameters['context'], 'formAddObjectLine') !== false) {
+
+		}
+
 		if (! $error) {
 			return 0; // or return 1 to replace standard code
 		} else {
