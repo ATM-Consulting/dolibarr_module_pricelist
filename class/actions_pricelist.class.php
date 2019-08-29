@@ -71,7 +71,7 @@ class Actionspricelist
 		$error = 0; // Error counter
 
 		if (strpos($parameters['context'], 'productservicelist') !== false) {
-			$this->resprints = '<option value="changePrice">' . $langs->trans("ChangePrice",$conf->global->PRICELISTPOURCENTAGEMASSACTION) . '</option>';
+			$this->resprints = '<option value="PriceListChangePrice">' . $langs->trans("PriceListChangePrice",$conf->global->PRICELISTPOURCENTAGEMASSACTION) . '</option>';
 		}
 
 		if (!$error) {
@@ -98,7 +98,7 @@ class Actionspricelist
 
 		if (strpos($parameters['context'], 'productservicelist') !== false)
 		{
-			if($massaction == 'changePrice')
+			if($massaction == 'PriceListChangePrice')
 			{
 				dol_include_once('abricot/includes/class/class.seedobject.php');
 				dol_include_once('comm/action/class/actioncomm.class.php');

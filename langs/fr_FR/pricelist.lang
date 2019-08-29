@@ -54,7 +54,7 @@ ConfirmDeletepricelistTitle=Confirmation de suppression
 ConfirmDeletepricelistBody=Souhaitez-vous vraiment supprimer cette fiche pricelist %s ?
 
 # Massaction
-ChangePrice=Augmenter le prix de %s&#x25;
+PriceListChangePrice=Augmenter le prix de %s&#x25;
 PriceListeAugmentationMassValue=Augmentation en masse (en pourcentage)
 
 
