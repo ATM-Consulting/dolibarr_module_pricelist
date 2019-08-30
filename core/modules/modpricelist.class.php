@@ -70,8 +70,8 @@ class modpricelist extends DolibarrModules
 		$this->picto='pricelist@pricelist';
 
 		$this->module_parts = array(
-			'hooks' => array('data'=>array('main','formAddObjectLine')
-			)
+			'hooks' => array('main','productcard'),
+			'triggers' => 1
 		);
 
 		// Data directories to create when module is enabled.
@@ -312,14 +312,14 @@ class modpricelist extends DolibarrModules
 
 		dolibarr_set_const($db,'PRICELISTPOURCENTAGEMASSACTION','20');
 
-		$result=$this->_load_tables('/pricelist/sql/');
+		$result = $this->_load_tables('/pricelist/sql/');
 
 		$extrafields = new ExtraFields($db);
 
-		$result = $extrafields->addExtraField('fact_desc', 'Description Facture', 'html', 101, 1024, 'product');
-		$result = $extrafields->addExtraField('dev_desc', 'Description Devis', 'html', 102, 1024, 'product');
-		$result = $extrafields->addExtraField('comm_desc', 'Description Commande', 'html', 103, 1024, 'product');
-		$result = $extrafields->addExtraField('pl_desc', 'Description Grille Tarifaire', 'html', 104, 1024, 'product');
+		$result = $extrafields->addExtraField('description_facture', 'Description Facture', 'html', 101, 1024, 'product');
+		$result = $extrafields->addExtraField('description_devis', 'Description Devis', 'html', 102, 1024, 'product');
+		$result = $extrafields->addExtraField('description_commande', 'Description Commande', 'html', 103, 1024, 'product');
+		$result = $extrafields->addExtraField('description_pricelist', 'Description Grille Tarifaire', 'html', 104, 1024, 'product');
 
 		//FOR HOOK formAddObjectLine
 

@@ -97,8 +97,8 @@ class Interfacepricelisttrigger
             return $langs->trans("Unknown");
         }
     }
-	
-	
+
+
 	/**
 	 * Function called when a Dolibarrr business event is done.
 	 * All functions "run_trigger" are triggered if file is inside directory htdocs/core/triggers
@@ -114,8 +114,8 @@ class Interfacepricelisttrigger
 		//For 8.0 remove warning
 		$result=$this->run_trigger($action, $object, $user, $langs, $conf);
 		return $result;
-	}	
-		
+	}
+
 
     /**
      * Function called when a Dolibarrr business event is done.
@@ -268,6 +268,10 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'LINEORDER_INSERT') {
+			if ($object->product_type == '1'){
+				$object = $this->changeDesc($object,'commande');
+				$object->update($user);
+			}
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
@@ -334,6 +338,8 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'LINEPROPAL_INSERT') {
+        	var_dump($object);exit;
+        	$object->descritpion = $object->fact_desc;
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
@@ -408,6 +414,10 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'LINEBILL_INSERT') {
+        	if ($object->product_type == '1'){
+				$object = $this->changeDesc($object,'facture');
+				$object->update($user);
+			}
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
@@ -586,4 +596,38 @@ class Interfacepricelisttrigger
 
         return 0;
     }
+
+
+	/**
+	 * TODO Voir trigger devis et grille tarifaire
+	 *
+	 */
+	/**
+	 * @param $object
+	 * @param string $context
+	 * @return mixed
+	 */
+	private function changeDesc($object,$context = 'default')
+	{
+		global $db;
+		if (! empty($object->fk_product)){
+			$product = new Product($db);
+			$product->fetch($object->fk_product);
+			switch ($context){
+				case 'facture':
+					$object->desc = $product->array_options['options_descritpion_facture'];
+					return $object;
+				case 'commande':
+					$object->desc = $product->array_options['options_descritpion_commande'];
+					return $object;
+				case 'pricelist':
+					$object->desc = $product->array_options['options_descritpion_pricelist'];
+					return $object;
+				case 'devis':
+					$object->desc = $product->array_options['options_descritpion_devis'];
+					return $object;
+			}
+		}
+		return $object;
+	}
 }
