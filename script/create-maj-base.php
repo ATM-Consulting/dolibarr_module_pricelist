@@ -27,12 +27,8 @@ if(!defined('INC_FROM_DOLIBARR')) {
 	global $db;
 }
 
-
-/* uncomment
-
-
 dol_include_once('/pricelist/class/pricelist.class.php');
 
 $o=new pricelist($db);
 $o->init_db_by_vars();
-*/
+

@@ -70,7 +70,7 @@ class modpricelist extends DolibarrModules
 		$this->picto='pricelist@pricelist';
 
 		$this->module_parts = array(
-			'hooks' => array('main','productcard'),
+			'hooks' => array('main'),
 			'triggers' => 1
 		);
 
@@ -121,7 +121,9 @@ class modpricelist extends DolibarrModules
 		// 'stock'            to add a tab in stock view
 		// 'thirdparty'       to add a tab in third party view
 		// 'user'             to add a tab in user view
-        $this->tabs = array();
+		$this->tabs = array(
+			'product:+pricelisttab:'.$langs->trans('Pricelist').':pricelist@pricelist:/pricelist/pricelistproduct.php?fk_product=__ID__'
+		);
 
         // Dictionaries
 	    if (! isset($conf->pricelist->enabled))
@@ -174,106 +176,33 @@ class modpricelist extends DolibarrModules
 
 		// Main menu entries
 		$this->menu = array();			// List of menus to add
-		$r=0;
 
 		// Add here entries to declare new menus
-		//
-		// Example to declare a new Top Menu entry and its Left menu entry:
-		// $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=pricelist',		// Put 0 if this is a single top menu or keep fk_mainmenu to give an entry on left
-		//							'type'=>'top',			                // This is a Top menu entry
-		//							'titre'=>'pricelist top menu',
-		//							'mainmenu'=>'pricelist',
-		//							'leftmenu'=>'pricelist_left',			// This is the name of left menu for the next entries
-		//							'url'=>'/pricelist/pagetop.php',
-		//							'langs'=>'pricelist@pricelist',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-		//							'position'=>100,
-		//							'enabled'=>'$conf->pricelist->enabled',	// Define condition to show or hide menu entry. Use '$conf->pricelist->enabled' if entry must be visible if module is enabled.
-		//							'perms'=>'1',			                // Use 'perms'=>'$user->rights->pricelist->level1->level2' if you want your menu with a permission rules
-		//							'target'=>'',
-		//							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
-		// $r++;
-		//
-		// Example to declare a Left Menu entry into an existing Top menu entry:
-		// $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=pricelist,fk_leftmenu=pricelist_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-		//							'type'=>'left',			                // This is a Left menu entry
-		//							'titre'=>'pricelist left menu',
-		//							'mainmenu'=>'pricelist',
-		//							'leftmenu'=>'pricelist_left',			// Goes into left menu previously created by the mainmenu
-		//							'url'=>'/pricelist/pagelevel2.php',
-		//							'langs'=>'pricelist@pricelist',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-		//							'position'=>100,
-		//							'enabled'=>'$conf->pricelist->enabled',  // Define condition to show or hide menu entry. Use '$conf->pricelist->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-		//							'perms'=>'1',			                // Use 'perms'=>'$user->rights->pricelist->level1->level2' if you want your menu with a permission rules
-		//							'target'=>'',
-		//							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
-		// $r++;
+		$r=0;
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=products',
+			'type'=>'left',
+			'titre'=>'PriceList',
+			'mainmenu'=>'products',
+			'leftmenu'=>'pricelist',
+			'url'=>'/pricelist/changeprice.php?leftmenu=pricelistjoss',
+			'langs'=>'pricelist@pricelist',
+			'position'=>100+$r, 'enabled'=>'1',
+			'perms'=>'1',
+			'target'=>'', 'user'=>2);
+		$r++;
 
-/*
-		$this->menu[$r]=array(
-			'fk_menu'=>0,			                // Put 0 if this is a top menu
-			'type'=>'top',			                // This is a Top menu entry
-			'titre'=>$langs->trans('TopMenupricelist'),
-			'mainmenu'=>'pricelist',
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=products,fk_leftmenu=pricelist',
+			'type'=>'left',
+			'titre'=>'changePrice',
+			'mainmenu'=>'',
 			'leftmenu'=>'',
-			'url'=>'/pricelist/list.php',
-			'langs'=>'pricelist@pricelist',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>100+$r,
-			'enabled'=>'$conf->pricelist->enabled',	// Define condition to show or hide menu entry. Use '$conf->missionorder->enabled' if entry must be visible if module is enabled.
-			'perms'=>'$user->rights->pricelist->read',			                // Use 'perms'=>'$user->rights->missionorder->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>0
-		);
-		$r++;
+			'url'=>'/pricelist/changeprice.php',
+			'langs'=>'pricelist@pricelist',
+			'position'=>100+$r, 'enabled'=>'1',
+			'perms'=>'1',
+			'target'=>'', 'user'=>2);
 
-		$this->menu[$r]=array(
-			'fk_menu'=>'fk_mainmenu=pricelist',			                // Put 0 if this is a top menu
-			'type'=>'left',			                // This is a Top menu entry
-			'titre'=>$langs->trans('TopMenupricelist'),
-			'mainmenu'=>'pricelist',
-			'leftmenu'=>'pricelist_left',
-			'url'=>'/pricelist/list.php',
-			'langs'=>'pricelist@pricelist',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>100+$r,
-			'enabled'=>'$conf->pricelist->enabled',	// Define condition to show or hide menu entry. Use '$conf->missionorder->enabled' if entry must be visible if module is enabled.
-			'perms'=>'$user->rights->pricelist->read',			                // Use 'perms'=>'$user->rights->missionorder->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>0
-		);
 		$r++;
-
-		$this->menu[$r]=array(
-			'fk_menu'=>'fk_mainmenu=pricelist,fk_leftmenu=pricelist_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('LeftMenupricelistCreate'),
-			'mainmenu'=>'pricelist',
-			'leftmenu'=>'pricelist_left_create',
-			'url'=>'/pricelist/card.php?action=create',
-			'langs'=>'pricelist@pricelist',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>100+$r,
-			'enabled'=> '$conf->pricelist->enabled',  // Define condition to show or hide menu entry. Use '$conf->missionorder->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=> '$user->rights->pricelist->write',			                // Use 'perms'=>'$user->rights->missionorder->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>0
-		);				                // 0=Menu for internal users, 1=external users, 2=both
-		$r++;
-
-
-		$this->menu[$r]=array(
-			'fk_menu'=>'fk_mainmenu=pricelist,fk_leftmenu=pricelist_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('LeftMenupricelistList'),
-			'mainmenu'=>'pricelist',
-			'leftmenu'=>'pricelist_left_list',
-			'url'=>'/pricelist/list.php',
-			'langs'=>'pricelist@pricelist',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>100+$r,
-			'enabled'=> '$conf->pricelist->enabled',  // Define condition to show or hide menu entry. Use '$conf->missionorder->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=> '$user->rights->pricelist->write',			                // Use 'perms'=>'$user->rights->missionorder->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>0
-		);				                // 0=Menu for internal users, 1=external users, 2=both
-		$r++;
-*/
 
 		// Exports
 		$r=1;

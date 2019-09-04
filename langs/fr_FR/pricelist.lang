@@ -53,9 +53,21 @@ ConfirmValidatepricelistBody=Souhaitez-vous vraiment activer cette fiche priceli
 ConfirmDeletepricelistTitle=Confirmation de suppression
 ConfirmDeletepricelistBody=Souhaitez-vous vraiment supprimer cette fiche pricelist %s ?
 
+# Menus
+PriceList=Grilles Tarifaires
+changePrice=Modification prix de vente
+Pricelist = Grille Tarifaire
+
 # Massaction
 PriceListChangePrice=Augmenter le prix de %s&#x25;
 PriceListeAugmentationMassValue=Augmentation en masse (en pourcentage)
 
 
 MassActionChangePrice=Augmentation du prix de %s&#x25;
+
+# Modif Prix Produit
+EffectiveDate=Date de mise en application
+EndEffectiveDate=Date de fin de mise en application <br /><small>(Aucune si vide)</small>
+Motif=Motif changement de prix
+Reduc=Réduction
+TypeChange=Type de modification

@@ -56,49 +56,6 @@ class Actionspricelist
 		$this->db = $db;
 	}
 
-	/** TODO voir pour produit : laisser afficher les champs sur la fiche.
-	 *
-	 * Sinon : requete ajax pour pouvoir fetcher l'id du produit et le fetch pour déterminer produit / service.
-	 * Récupérer action
-	 *
-	 * @param $parameters
-	 * @param $object
-	 * @param $action
-	 * @param $hookmanager
-	 */
-	public function printCommonFooter($parameters, &$object, &$action, $hookmanager)
-	{
-		global $langs, $massaction, $conf;
-		$langs->load('pricelist@pricelist');
-		if (strpos($parameters['context'], 'productcard') !== false) {
-			if ($action = 'view'){
-				?>
-				<script type="text/javascript">
-                    $(document).ready(function() {
-                       // $(".product_extras_description_pricelist").parent().hide();
-                        /*$(".product_extras_description_pricelist").parent().hide();
-                        $(".product_extras_description_pricelist").parent().hide();
-                        $(".product_extras_description_pricelist").parent().hide();*/
-                    });
-				</script>
-				<?php
-			}
-			else{
-				?>
-				<script type="text/javascript">
-                    $(document).ready(function() {
-                        // $(".product_extras_description_pricelist").show();
-                        /*$(".product_extras_description_pricelist").hide();
-                        $(".product_extras_description_pricelist").hide();
-                        $(".product_extras_description_pricelist").hide();*/
-                    });
-				</script>
-				<?php
-			}
-		}
-		return 0;
-	}
-
 	/** Add option in massaction of lists
 	 * @param $parameters
 	 * @param $object
