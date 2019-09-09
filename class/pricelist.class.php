@@ -24,6 +24,7 @@ if (!class_exists('SeedObject'))
 	require_once dirname(__FILE__).'/../config.php';
 }
 
+include_once DOL_DOCUMENT_ROOT .'/cron/class/cronjob.class.php';
 
 class Pricelist extends SeedObject
 {
@@ -38,6 +39,9 @@ class Pricelist extends SeedObject
 
 	/** @var int $ismultientitymanaged 0=No test on entity, 1=Test with field entity, 2=Test with link by societe */
 	public $ismultientitymanaged = 1;
+
+	public $childtablesoncascade = array();
+
 
 	/**
 	 *  'type' is the field format.
@@ -76,13 +80,13 @@ class Pricelist extends SeedObject
 			'position' => 20,
 		),
 		'price' => array(
-			'type' => 'double',
+			'type' => 'varchar(255)',
 			'enabled' => 1,
 			'visible' => 1,
 			'position' => 50
 		),
 		'reduction' => array(
-			'type' => '	double',
+			'type' => 'varchar(255)',
 			'enabled' => 1,
 			'visible' => 1,
 			'position' => 50
@@ -94,17 +98,17 @@ class Pricelist extends SeedObject
 			'position' => 30
 		),
 		'date_start' => array(
-			'type' => 'datetime',
+			'type' => 'date',
 			'enabled' => 1,
 			'visible' => 1,
 			'position' => 40
-		),
-		'date_end' => array(
-			'type' => 'datetime',
+		)
+		/*'date_end' => array(
+			'type' => 'date',
 			'enabled' => 1,
 			'visible' => 1,
 			'position' => 50
-		)
+		)*/
 	);
 
 
@@ -123,7 +127,7 @@ class Pricelist extends SeedObject
 		$this->entity = $conf->entity;
 	}
 
-	public function setElements($rowid,$fk_product,$price = 0,$reduction = 0,$reason = '',$date_start,$date_end = '')
+	public function setElements($rowid,$fk_product,$date_start,$price = 0,$reduction = 0,$reason = '',$date_end = '')
 	{
 		$this->rowid = $rowid;
 		$this->fk_product = $fk_product;
@@ -131,7 +135,7 @@ class Pricelist extends SeedObject
 		$this->reduction =$reduction;
 		$this->reason =$reason;
 		$this->date_start =$date_start;
-		$this->date_end =$date_end;
+		//$this->date_end =$date_end;
 	}
 
 	/**
@@ -153,6 +157,27 @@ class Pricelist extends SeedObject
 
 		unset($this->fk_element); // avoid conflict with standard Dolibarr comportment
 		return parent::delete($user);
+	}
+
+	public function create(User &$user){
+		global $lang;
+		$now = strtotime(date("Y-m-d"));
+		if ($this->date_start < $now){
+			setEventMessage($lang->trans('inferiorDateError'), 'errors');
+			return -1;
+		}
+		if ($this->date_start == $now){
+			$product = new Product($this->db);
+			$product->fetch($this->fk_product);
+			if ($this->reduction != ''){
+				$new_price = $product->price + $product->price * $this->reduction/100;
+			}
+			else {
+				$new_price =$this->price;
+			}
+			$product->updatePrice($new_price, 'HT', $user);
+		}
+		return parent::create($user);
 	}
 
 	/**
@@ -190,8 +215,8 @@ class Pricelist extends SeedObject
 		$sql.= ' price,';
 		$sql.= ' reduction,';
 		$sql.= ' reason,';
-		$sql.= ' date_start,';
-		$sql.= ' date_end';
+		$sql.= ' date_start';
+		//$sql.= ' ,date_end';
 		$sql.= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
 		$sql.= ' WHERE fk_product='.$productID;
 		$sql.= ' AND entity='.getEntity('products');
@@ -214,8 +239,9 @@ class Pricelist extends SeedObject
 					$TPricelist[$obj->rowid]['price'] = $obj->price;
 					$TPricelist[$obj->rowid]['reduction'] = $obj->reduction;
 					$TPricelist[$obj->rowid]['reason'] = $obj->reason;
-					$TPricelist[$obj->rowid]['date_start'] = $obj->date_start;
-					$TPricelist[$obj->rowid]['date_end'] = $obj->date_end;
+					$TPricelist[$obj->rowid]['date_start'] =  date("d/m/Y",strtotime($obj->date_start));
+					//if (isset($obj->date_end))
+					//	$TPricelist[$obj->rowid]['date_end'] =  date("d/m/Y",strtotime($obj->date_end));
 				}
 				$i++;
 			}
@@ -264,5 +290,35 @@ class Pricelist extends SeedObject
 		$object->fetch($id, false, $ref);
 
 		return $object->getNomUrl($withpicto, $moreparams);
+	}
+
+	public function getAllToday(){
+		$now = date("Y-m-d").' 00:00:00';
+
+		$sql = 'SELECT';
+		$sql.= ' rowid,';
+		$sql.= ' date_start';
+		$sql.= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
+		$sql.= ' WHERE date_start="'.$now.'"';
+		$sql.= ' AND entity='.getEntity('products');
+
+		$TPricelist = array();
+
+		$resql=$this->db->query($sql);
+		if ($resql)
+		{
+			$num = $this->db->num_rows($resql);
+			$i = 0;
+			while ($i < $num)
+			{
+				$obj = $this->db->fetch_object($resql);
+				if ($obj)
+				{
+					$TPricelist[$obj->rowid]= $obj->rowid;
+				}
+				$i++;
+			}
+		}
+		return $TPricelist;
 	}
 }

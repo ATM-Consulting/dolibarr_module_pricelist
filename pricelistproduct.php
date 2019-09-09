@@ -13,6 +13,9 @@ $langs->Load("other");
 $langs->Load("bank");
 
 $fk_product = GETPOST('fk_product','int');
+$toselect = GETPOST('toselect');
+$save = __get('save');
+$massaction=__get('massaction','list');
 $action=__get('action','list');
 
 llxHeader('',$langs->trans('Pricelist'),'','');
@@ -21,17 +24,70 @@ $pricelist = new Pricelist($db);
 $product = new Product($db);
 $result=$product->fetch($fk_product);
 
-$head=product_prepare_head($product, $user);
+$head=product_prepare_head($product);
 $titre=$langs->trans("CardProduct".$product->type);
 $picto=($product->type==1?'service':'product');
 dol_fiche_head($head, 'pricelisttab', $titre, 0, $picto);
+
+$object = $product;
+$form = new Form($db);
+$formA = new TFormCore($db);
 
 /*
  *  ACTIONS
  */
 
-if ($action == 'changePriceProduct'){
+if ($action == 'changePriceProduct' && isset($save)){
+	$now = strtotime(date("Y-m-d"));
 
+	$name_chmt = GETPOST('name_chmt','text');
+	$reason = GETPOST('motif_changement','text');
+	$price_chgmt = GETPOST('price_chgmt','int');
+	$reduc_chgmt = GETPOST('reduc_chgmt','int');
+	$date_start_day = GETPOST('start_dateday','text');
+	$date_start_month = GETPOST('start_datemonth','text');
+	$date_start_year = GETPOST('start_dateyear','text');
+	$date_start = strtotime($date_start_year.'-'.$date_start_month.'-'.$date_start_day);
+	/*$date_end_day = GETPOST('end_dateday','text');
+	$date_end_month = GETPOST('end_datemonth','text');
+	$date_end_year = GETPOST('end_dateyear','text');
+	$date_end = strtotime($date_end_year.'-'.$date_end_month.'-'.$date_end_day);*/
+
+	if ($date_start < $now){
+		setEventMessage('inferiorDateError', 'errors');
+	}
+	else{
+		if ($date_start == $now){
+
+		}
+		$pricelist->fk_product = $fk_product;
+
+		$pricelist->reduction = '';
+		$pricelist->price = '';
+
+		if ($name_chmt == 'reduc') {
+			$pricelist->reduction = $reduc_chgmt;
+		}
+		if ($name_chmt == 'price') {
+			$pricelist->price = $price_chgmt;
+		}
+
+		$pricelist->reason =$reason;
+		$pricelist->date_start =$date_start;
+		//$pricelist->date_end =$date_end;
+
+		$pricelist->create($user);
+	}
+}
+
+if ($action = 'massactionDeletePriceListConfirm' && GETPOST('confirm') == 'yes'){
+	$TSelectedPricelist = GETPOST('toselect');
+	if (! empty($TSelectedPricelist)){
+		foreach ($TSelectedPricelist as $priceListId){
+			$pricelist->fetch($priceListId);
+			$pricelist->delete($user);
+		}
+	}
 }
 
 /*
@@ -39,10 +95,6 @@ if ($action == 'changePriceProduct'){
  */
 
 // Card
-
-$object = $product;
-$form = new Form($db);
-$formA = new TFormCore($db);
 
 print '<table class="border" width="100%">';
 
@@ -82,7 +134,7 @@ print $langs->trans('TypeChange');
 print '</td><td>';
 ?>
 		<input type="radio" id="id_reduc" name="name_chmt" value="reduc" onchange="handleChange();" checked>
-		<label for="reduc"><?=$langs->trans('Reduction') ?></label>
+		<label for="reduc"><?=$langs->trans('Percent') ?></label>
 		<input type="radio" id="id_price" name="name_chmt" value="price" onchange="handleChange();">
 		<label for="price"><?=$langs->trans('Price') ?></label>
 
@@ -110,9 +162,9 @@ print $formA->texte('','price_chgmt','0',null,null,'style="width:4em"'); print '
 print '</td></tr>';
 
 print '<tr class = "input_reduc"><td width="30%">';
-print $langs->trans('Reduction');
+print $langs->trans('Percent');
 print '</td><td>';
-print $formA->texte('','price_chgmt','20',null,null,'style="width:4em"'); print '%';
+print $formA->texte('','reduc_chgmt','20',null,null,'style="width:4em"'); print '%';
 print '</td></tr>';
 
 print '<tr><td width="30%">';
@@ -120,13 +172,13 @@ print $langs->trans('EffectiveDate');
 print '</td><td>';
 $form->select_date('','start_date',0,0,0,'date_select',1,1);
 print '</td></tr>';
-
+/*
 print '<tr><td width="30%">';
 print $langs->trans('EndEffectiveDate');
 print '</td><td>';
 $form->select_date('','end_date',0,0,1,'date_select_end',1,1);
 print '</td></tr>';
-
+*/
 print '<tr><td width="30%">';
 print $langs->trans('Motif');
 print '</td><td>';
@@ -146,6 +198,23 @@ $TPricelist = $pricelist->getAllByProductId($fk_product);
 $listview = new Listview($db, 'pricelist_view');
 $nbLine = !empty($user->conf->MAIN_SIZE_LISTE_LIMIT) ? $user->conf->MAIN_SIZE_LISTE_LIMIT : $conf->global->MAIN_SIZE_LISTE_LIMIT;
 
+/*
+ * Price calculation
+ */
+
+
+
+/*
+ *
+ */
+$formA->begin_form('massactionDeletePriceList','massactionDeletePriceList');
+
+if ($massaction == 'massactionDeletePriceList'){
+	$page = 'pricelistproduct.php?fk_product='.$fk_product.'&action=massactionDeletePriceList';
+	print '<div style="padding-top: 2em;">';
+	print $form->formconfirm($_SERVER["PHP_SELF"], $langs->trans("ConfirmMassDeletion"), $langs->trans("ConfirmMassDeletionQuestion", count($toselect)), "delete", null, '', 0, 200, 500, 1);
+	print '</div>';
+}
 print $listview->renderArray($db, $TPricelist, array(
 	'view_type' => 'list'
 	, 'allow-fields-select' => true
@@ -178,21 +247,23 @@ print $listview->renderArray($db, $TPricelist, array(
 		, 'massactions' => array(
 			'massactionDeletePriceList' => $langs->trans('Delete')
 		)
+		, 'arrayofselected' => $toselect
 	)
 	, 'title' => array(
-		'rowid' => 'rowid'
+		'rowid' => 'ID'
 		, 'date_start' => $langs->trans('DateStart')
-		, 'date_end' => $langs->trans('DateEnd')
-		, 'price' => $langs->trans('Price')
-		, 'reduction' => $langs->trans('Reduc')
+		//, 'date_end' => $langs->trans('DateEnd')
+		, 'price' => $langs->trans('NewPrice')
+		, 'reduction' => $langs->trans('Percent')
 		, 'reason' => $langs->trans('Motif')
 		, 'selectedfields' => '' // For massaction checkbox
 	)
 	, 'eval' => array()
 ));
 ?>
-
 <?php
+
+$formA->end();
 
 llxFooter();
 $db->close();

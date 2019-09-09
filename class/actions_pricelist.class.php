@@ -102,21 +102,16 @@ class Actionspricelist
 			{
 				dol_include_once('abricot/includes/class/class.seedobject.php');
 				dol_include_once('comm/action/class/actioncomm.class.php');
-				$event = new ActionComm($db);
+				dol_include_once('pricelist/class/pricelist.class.php');
 				foreach ($parameters['toselect'] as $selectId){
+					$pricelist = new Pricelist($db);
 
-					$object->fetch($selectId);
-					$augmentation = 1+($conf->global->PRICELISTPOURCENTAGEMASSACTION/100);
-					$object->updatePrice($object->price*$augmentation, 'HT', $user);
-					$event->userownerid = $user->id;
-					$event->fk_element = $selectId;
-					$event->elementtype = $object->element;
-					$event->type_code = 'AC_OTH_AUTO';
-					$event->label = $langs->trans('MassActionChangePrice',$conf->global->PRICELISTPOURCENTAGEMASSACTION);
-					$event->percentage = '-1';
-					$event->datep = dol_now();
+					$pricelist->fk_product = $selectId;
+					$pricelist->reduction = $conf->global->PRICELISTPOURCENTAGEMASSACTION;
+					$pricelist->date_start = strtotime(date("Y-m-d"));
+					$pricelist->reason = $langs->trans('MassActionChangePrice');
 
-					$event->create($user);
+					$pricelist->create($user);
 				}
 			}
 		}
