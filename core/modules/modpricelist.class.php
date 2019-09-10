@@ -70,7 +70,7 @@ class modpricelist extends DolibarrModules
 		$this->picto='pricelist@pricelist';
 
 		$this->module_parts = array(
-			'hooks' => array('main'),
+			'hooks' => array('main','productservicelist'),
 			'triggers' => 1
 		);
 
@@ -250,7 +250,11 @@ class modpricelist extends DolibarrModules
 		$result = $extrafields->addExtraField('description_commande', 'Description Commande', 'html', 103, 1024, 'product');
 		$result = $extrafields->addExtraField('description_pricelist', 'Description Grille Tarifaire', 'html', 104, 1024, 'product');
 
-		//FOR HOOK formAddObjectLine
+		$result = $extrafields->addExtraField('last_date_price', 'Date dernière modification du prix', 'date', 105, 1024, 'product',0,0,'','',1,'','2');
+
+		// Cron pricelist auto
+
+		$this->_addCronTaskAutoPriceUpdate();
 
 		return $this->_init($sql, $options);
 	}
@@ -270,4 +274,49 @@ class modpricelist extends DolibarrModules
 		return $this->_remove($sql, $options);
     }
 
+    function _addCronTaskAutoPriceUpdate(){
+    	global $user, $langs;
+
+		$cronJob = new Cronjob($this->db);
+		$status=3; // Select All
+
+		$filter = array(
+			'jobtype'     => 'method',
+			'classesname' => 'pricelist/class/pricelist.class.php',
+			'objectname'  => 'pricelist',
+			'module_name' => 'pricelist',
+			'methodename' => 'runUpdatePricelist',
+		);
+
+		$cronJob->fetch_all('DESC', 't.rowid',0, 0, $status, $filter);
+
+		if(empty($cronJob->lines))
+		{
+			$cronJob = new Cronjob($this->db); // au cas ou... j'en créé un tout propre
+
+			$cronJob->jobtype       = 'method';
+			$cronJob->label         = 'Mise à jour Prix de vente';
+			$cronJob->classesname   = 'pricelist/class/pricelist.class.php';
+			$cronJob->objectname    = 'pricelist';
+			$cronJob->module_name   = 'pricelist';
+			$cronJob->methodename   = 'runUpdatePricelist';
+			$cronJob->priority = 0;
+			$date = new DateTime();
+			$cronJob->datestart = $date->format('Y-m-d 00:00');
+
+			$cronJob->unitfrequency = 86400; // days
+			$cronJob->frequency = 1; // each days
+			$cronJob->status = 1; // enable by default
+			$cronJob->note = '';
+			if($cronJob->create($user) > 0)
+			{
+				setEventMessages( $langs->trans('CronTaskAdded'), null, 'mesgs');
+			}
+			else
+			{
+				setEventMessages( $langs->trans('CronTaskAddError'), $cronJob->errors, 'errors');
+			}
+		}
+
+	}
 }

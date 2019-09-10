@@ -237,7 +237,11 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'PRODUCT_DELETE') {
-            dol_syslog(
+        	global $db;
+        	dol_include_once('pricelist/class/pricelist.class.php');
+			$pricelist = new Pricelist($db);
+        	$pricelist->deleteAllOfProduct($object->id);
+			dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         }
@@ -338,7 +342,6 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'LINEPROPAL_INSERT') {
-        	var_dump($object);exit;
         	$object->descritpion = $object->fact_desc;
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id

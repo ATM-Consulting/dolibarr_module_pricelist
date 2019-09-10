@@ -123,7 +123,8 @@ class Actionspricelist
 		}
 	}
 
-	private function _changeDescritpion($object){
-		return $object;
+	public function printFieldListSelect(){
+
 	}
+
 }

@@ -17,6 +17,20 @@ $toselect = GETPOST('toselect');
 $save = __get('save');
 $massaction=__get('massaction','list');
 $action=__get('action','list');
+$confirm=__get('confirm','no');
+
+$name_chmt = GETPOST('name_chmt','text');
+$reason = GETPOST('motif_changement','text');
+$price_chgmt = GETPOST('price_chgmt','int');
+$reduc_chgmt = GETPOST('reduc_chgmt','int');
+$date_start_day = GETPOST('start_dateday','text');
+$date_start_month = GETPOST('start_datemonth','text');
+$date_start_year = GETPOST('start_dateyear','text');
+$date_start = strtotime($date_start_year.'-'.$date_start_month.'-'.$date_start_day);
+/*$date_end_day = GETPOST('end_dateday','text');
+$date_end_month = GETPOST('end_datemonth','text');
+$date_end_year = GETPOST('end_dateyear','text');
+$date_end = strtotime($date_end_year.'-'.$date_end_month.'-'.$date_end_day);*/
 
 llxHeader('',$langs->trans('Pricelist'),'','');
 
@@ -30,6 +44,7 @@ $picto=($product->type==1?'service':'product');
 dol_fiche_head($head, 'pricelisttab', $titre, 0, $picto);
 
 $object = $product;
+
 $form = new Form($db);
 $formA = new TFormCore($db);
 
@@ -37,29 +52,31 @@ $formA = new TFormCore($db);
  *  ACTIONS
  */
 
+if ($action  == 'confirmDate' && $confirm == 'yes'){
+	$date_start = strtotime(GETPOST('date_start','text'));
+	$pricelist->fk_product = $fk_product;
+	$pricelist->reduction = '';
+	$pricelist->price = '';
+	if ($name_chmt == 'reduc') {
+		$pricelist->reduction = $reduc_chgmt;
+	}
+	if ($name_chmt == 'price') {
+		$pricelist->price = $price_chgmt;
+	}
+
+	$pricelist->reason =$reason;
+	$pricelist->date_start =$date_start;
+
+	$pricelist->create($user);
+}
+
 if ($action == 'changePriceProduct' && isset($save)){
 	$now = strtotime(date("Y-m-d"));
-
-	$name_chmt = GETPOST('name_chmt','text');
-	$reason = GETPOST('motif_changement','text');
-	$price_chgmt = GETPOST('price_chgmt','int');
-	$reduc_chgmt = GETPOST('reduc_chgmt','int');
-	$date_start_day = GETPOST('start_dateday','text');
-	$date_start_month = GETPOST('start_datemonth','text');
-	$date_start_year = GETPOST('start_dateyear','text');
-	$date_start = strtotime($date_start_year.'-'.$date_start_month.'-'.$date_start_day);
-	/*$date_end_day = GETPOST('end_dateday','text');
-	$date_end_month = GETPOST('end_datemonth','text');
-	$date_end_year = GETPOST('end_dateyear','text');
-	$date_end = strtotime($date_end_year.'-'.$date_end_month.'-'.$date_end_day);*/
 
 	if ($date_start < $now){
 		setEventMessage('inferiorDateError', 'errors');
 	}
 	else{
-		if ($date_start == $now){
-
-		}
 		$pricelist->fk_product = $fk_product;
 
 		$pricelist->reduction = '';
@@ -76,11 +93,23 @@ if ($action == 'changePriceProduct' && isset($save)){
 		$pricelist->date_start =$date_start;
 		//$pricelist->date_end =$date_end;
 
-		$pricelist->create($user);
+		if ($pricelist->lastYear($fk_product)){
+			print $formA->begin_form('pricelistproduct.php?fk_product='.$fk_product,'confirmDate');
+			print $formA->hidden('name_chmt',$name_chmt);
+			print $formA->hidden('reason',$reason);
+			print $formA->hidden('price_chgmt',$price_chgmt);
+			print $formA->hidden('reduc_chgmt',$reduc_chgmt);
+			print $formA->hidden('date_start',$date_start_year.'-'.$date_start_month.'-'.$date_start_day);
+			print $form->formconfirm('pricelistproduct.php?fk_product='.$fk_product,$langs->trans('confirmDate'),$langs->trans('confirmDateQuestion'),'confirmDate',null,'yes', 0, 200, 500, '1');
+			print $formA->end_form();
+		}
+		else{
+			$pricelist->create($user);
+		}
 	}
 }
 
-if ($action = 'massactionDeletePriceListConfirm' && GETPOST('confirm') == 'yes'){
+if ($action = 'massactionDeletePriceListConfirm' && $confirm == 'yes'){
 	$TSelectedPricelist = GETPOST('toselect');
 	if (! empty($TSelectedPricelist)){
 		foreach ($TSelectedPricelist as $priceListId){
@@ -119,6 +148,8 @@ print '</td></tr>';
 print "</table>\n";
 
 print "</div>\n";
+
+// Form
 
 print '<table class="notopnoleftnoright" width="100%" border="0" style="margin-bottom: 2px;" summary="">';
 print '<tbody><tr>';
@@ -193,20 +224,12 @@ print '</form>';
 
 //  List
 
-dol_include_once('abricot/includes/class/class.listview.php');
 $TPricelist = $pricelist->getAllByProductId($fk_product);
+
+dol_include_once('abricot/includes/class/class.listview.php');
 $listview = new Listview($db, 'pricelist_view');
 $nbLine = !empty($user->conf->MAIN_SIZE_LISTE_LIMIT) ? $user->conf->MAIN_SIZE_LISTE_LIMIT : $conf->global->MAIN_SIZE_LISTE_LIMIT;
 
-/*
- * Price calculation
- */
-
-
-
-/*
- *
- */
 $formA->begin_form('massactionDeletePriceList','massactionDeletePriceList');
 
 if ($massaction == 'massactionDeletePriceList'){

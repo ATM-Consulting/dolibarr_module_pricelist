@@ -127,17 +127,6 @@ class Pricelist extends SeedObject
 		$this->entity = $conf->entity;
 	}
 
-	public function setElements($rowid,$fk_product,$date_start,$price = 0,$reduction = 0,$reason = '',$date_end = '')
-	{
-		$this->rowid = $rowid;
-		$this->fk_product = $fk_product;
-		$this->price =$price;
-		$this->reduction =$reduction;
-		$this->reason =$reason;
-		$this->date_start =$date_start;
-		//$this->date_end =$date_end;
-	}
-
 	/**
 	 * @param User $user User object
 	 * @return int
@@ -148,6 +137,7 @@ class Pricelist extends SeedObject
 	}
 
 	/**
+	 * Delete pricelist
 	 * @param User $user User object
 	 * @return int
 	 */
@@ -159,6 +149,21 @@ class Pricelist extends SeedObject
 		return parent::delete($user);
 	}
 
+	public function deleteAllOfProduct(User &$user, $fk_product){
+		$TIds = getAllByProductId($fk_product);
+		foreach ($TIds as $id) {
+			$this->fetch($id);
+			if ($this->delete($user) < 1)
+				return -1;
+		}
+		return 1;
+	}
+
+	/**
+	 * Create Pricelist // If start date is today, immediately changes the price of the product
+	 * @param User $user User registered
+	 * @return int return id
+	 */
 	public function create(User &$user){
 		global $lang;
 		$now = strtotime(date("Y-m-d"));
@@ -176,6 +181,9 @@ class Pricelist extends SeedObject
 				$new_price =$this->price;
 			}
 			$product->updatePrice($new_price, 'HT', $user);
+
+			$product->array_options['options_last_date_price'] = $this->date_start;
+			$product->updateExtraField('last_date_price');
 		}
 		return parent::create($user);
 	}
@@ -208,6 +216,11 @@ class Pricelist extends SeedObject
 		return $result;
 	}
 
+	/**
+	 * Get all pricelists according to a product ID
+	 * @param $productID Product linked
+	 * @return array of Ids of pricelists
+	 */
 	public function getAllByProductId($productID){
 		$sql = 'SELECT';
 		$sql.= ' rowid,';
@@ -249,32 +262,6 @@ class Pricelist extends SeedObject
 		return $TPricelist;
 	}
 
-	public function getLastDateProduct($fk_product)
-	{
-		$sql = 'SELECT';
-		$sql.= ' rowid,';
-		$sql.= ' date_start';
-		$sql.= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
-		$sql.= ' WHERE fk_product='.$fk_product;
-		$sql.= ' AND entity='.getEntity('products');
-		$sql.= ' ORDER BY date_start DESC';
-		$sql.= ' LIMIT 1';
-
-		$res = array();
-
-		$resql=$this->db->query($sql);
-		if ($resql)
-		{
-			$obj = $this->db->fetch_object($resql);
-			if ($obj)
-			{
-				$res['rowid'] = $obj->rowid;
-				$res['date_start'] = $obj->date_start;
-			}
-		}
-		return $res;
-	}
-
 	/**
 	 * @param int $id Identifiant
 	 * @param null $ref Ref
@@ -292,6 +279,10 @@ class Pricelist extends SeedObject
 		return $object->getNomUrl($withpicto, $moreparams);
 	}
 
+	/**
+	 * Get all the Pricelists with today's date as beginning date
+	 * return Array of rowid od pricelists
+	 */
 	public function getAllToday(){
 		$now = date("Y-m-d").' 00:00:00';
 
@@ -320,5 +311,55 @@ class Pricelist extends SeedObject
 			}
 		}
 		return $TPricelist;
+	}
+
+	/**
+	 * Cron : update all prices according to pricelist
+	 * @return int 0 = success
+	 */
+	public function runUpdatePricelist(){
+		global $user;
+		dol_include_once('product/class/product.class.php');
+		$product = new Product($this->db);
+		$TPrLi = $this->getAllToday();
+
+		$i = 0;
+
+		foreach ($TPrLi as $idPL) {
+			$this->fetch($idPL);
+			$product->fetch($this->fk_product);
+
+			if ($this->reduction != ''){
+				$new_price = $product->price + $product->price * $this->reduction/100;
+			}
+			else {
+				$new_price =$this->price;
+			}
+			$product->updatePrice($new_price, 'HT', $user);
+
+			$product->array_options['options_last_date_price'] = $this->date_start;
+			$product->updateExtraField('last_date_price');
+
+			$i++;
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Product price has been modified during the past year
+	 * return : true if yes, false neither
+	 */
+	public function lastYear($fk_product){
+		$product = new Product($this->db);
+		$product->fetch($fk_product);
+		$year = date('Y');
+		$date = $year - 1 . date('-m-d');
+		$dateStp = strtotime($date);
+
+		if ($dateStp < $product->array_options['options_last_date_price']){
+			return true;
+		}
+		return false;
 	}
 }
