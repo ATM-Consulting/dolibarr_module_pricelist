@@ -78,7 +78,7 @@ PriceBefore=Prix avant
 PriceAfter=Prix après
 
 inferiorDateError=Impossible de renseigner une date antérieure
-
+NoPriceList=Aucun prix
 
 confirmDateQuestion=Voulez-vous réellement modifier le prix de nouveau ?
 confirmDate=Le prix de vente a déjà été modifié au cours de la dernière année

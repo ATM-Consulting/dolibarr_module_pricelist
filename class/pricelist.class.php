@@ -171,7 +171,7 @@ class Pricelist extends SeedObject
 			setEventMessage($lang->trans('inferiorDateError'), 'errors');
 			return -1;
 		}
-		if ($this->date_start == $now){
+		if ($this->date_start == $now){ //Change immediatly the price
 			$product = new Product($this->db);
 			$product->fetch($this->fk_product);
 			if ($this->reduction != ''){

@@ -32,18 +32,14 @@ $date_end_month = GETPOST('end_datemonth','text');
 $date_end_year = GETPOST('end_dateyear','text');
 $date_end = strtotime($date_end_year.'-'.$date_end_month.'-'.$date_end_day);*/
 
-llxHeader('',$langs->trans('Pricelist'),'','');
+
 
 $pricelist = new Pricelist($db);
 $product = new Product($db);
 $result=$product->fetch($fk_product);
 
-$head=product_prepare_head($product);
-$titre=$langs->trans("CardProduct".$product->type);
-$picto=($product->type==1?'service':'product');
-dol_fiche_head($head, 'pricelisttab', $titre, 0, $picto);
-
 $object = $product;
+$display_confirm = 0;
 
 $form = new Form($db);
 $formA = new TFormCore($db);
@@ -51,6 +47,8 @@ $formA = new TFormCore($db);
 /*
  *  ACTIONS
  */
+
+$back = $_SERVER['PHP_SELF'].'?fk_product='.$fk_product;
 
 if ($action  == 'confirmDate' && $confirm == 'yes'){
 	$date_start = strtotime(GETPOST('date_start','text'));
@@ -68,6 +66,8 @@ if ($action  == 'confirmDate' && $confirm == 'yes'){
 	$pricelist->date_start =$date_start;
 
 	$pricelist->create($user);
+	header("Location: ".$back);
+	exit;
 }
 
 if ($action == 'changePriceProduct' && isset($save)){
@@ -94,17 +94,12 @@ if ($action == 'changePriceProduct' && isset($save)){
 		//$pricelist->date_end =$date_end;
 
 		if ($pricelist->lastYear($fk_product)){
-			print $formA->begin_form('pricelistproduct.php?fk_product='.$fk_product,'confirmDate');
-			print $formA->hidden('name_chmt',$name_chmt);
-			print $formA->hidden('reason',$reason);
-			print $formA->hidden('price_chgmt',$price_chgmt);
-			print $formA->hidden('reduc_chgmt',$reduc_chgmt);
-			print $formA->hidden('date_start',$date_start_year.'-'.$date_start_month.'-'.$date_start_day);
-			print $form->formconfirm('pricelistproduct.php?fk_product='.$fk_product,$langs->trans('confirmDate'),$langs->trans('confirmDateQuestion'),'confirmDate',null,'yes', 0, 200, 500, '1');
-			print $formA->end_form();
+			$display_confirm = 1;
 		}
 		else{
 			$pricelist->create($user);
+			header("Location: ".$back);
+			exit;
 		}
 	}
 }
@@ -123,6 +118,13 @@ if ($action = 'massactionDeletePriceListConfirm' && $confirm == 'yes'){
  * VIEW
  */
 
+// Header
+
+llxHeader('',$langs->trans('Pricelist'),'','');
+$head=product_prepare_head($product);
+$titre=$langs->trans("CardProduct".$product->type);
+dol_fiche_head($head, 'pricelisttab', $titre, '0');
+
 // Card
 
 print '<table class="border" width="100%">';
@@ -139,7 +141,7 @@ print '</tr>';
 // TVA
 print '<tr><td>'.$langs->trans("VATRate").'</td><td>'.vatrate($object->tva_tx.($object->tva_npr?'*':''),true).'</td></tr>';
 // Price
-print '<tr><td>'.$langs->trans("Price").'</td><td>'.price($object->price).' HT </td></tr>';
+print '<tr><td>'.$langs->trans("SellingPrice").'</td><td>'.price($object->price).' HT </td></tr>';
 // Status (to sell)
 print '<tr><td>'.$langs->trans("Status").' ('.$langs->trans("Sell").')</td><td>';
 print $object->getLibStatut(2,0);
@@ -148,6 +150,19 @@ print '</td></tr>';
 print "</table>\n";
 
 print "</div>\n";
+
+// Confrim Form
+if ($display_confirm){
+	print $formA->begin_form('pricelistproduct.php?fk_product='.$fk_product,'confirmDate');
+	print $formA->hidden('name_chmt',$name_chmt);
+	print $formA->hidden('motif_changement',$reason);
+	print $formA->hidden('price_chgmt',$price_chgmt);
+	print $formA->hidden('reduc_chgmt',$reduc_chgmt);
+	print $formA->hidden('date_start',$date_start_year.'-'.$date_start_month.'-'.$date_start_day);
+	print $form->formconfirm('pricelistproduct.php?fk_product='.$fk_product,$langs->trans('confirmDate'),$langs->trans('confirmDateQuestion'),'confirmDate',null,'yes', 0, 200, 500, '1');
+	print $formA->end_form();
+}
+
 
 // Form
 
@@ -238,6 +253,7 @@ if ($massaction == 'massactionDeletePriceList'){
 	print $form->formconfirm($_SERVER["PHP_SELF"], $langs->trans("ConfirmMassDeletion"), $langs->trans("ConfirmMassDeletionQuestion", count($toselect)), "delete", null, '', 0, 200, 500, 1);
 	print '</div>';
 }
+
 print $listview->renderArray($db, $TPricelist, array(
 	'view_type' => 'list'
 	, 'allow-fields-select' => true

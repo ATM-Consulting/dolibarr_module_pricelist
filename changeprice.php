@@ -25,6 +25,7 @@ $permissiondellink = $user->rights->webhost->write;	// Used by the include of ac
 $langs->load('pricelist@pricelist');
 
 $action = GETPOST('action');
+$save = __get('save',null);
 
 $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'pricelistcard';   // To manage different context of search
 $backtopage = GETPOST('backtopage', 'alpha');
@@ -95,25 +96,7 @@ if ($action == 'changePriceAll' && isset($save)){
 		setEventMessage('inferiorDateError', 'errors');
 	}
 	else{
-		$form->form_confirm('','','','','','','','','');
-		/*
-		$pricelist->fk_product = $fk_product;
 
-		$pricelist->reduction = '';
-		$pricelist->price = '';
-
-		if ($name_chmt == 'reduc') {
-			$pricelist->reduction = $reduc_chgmt;
-		}
-		if ($name_chmt == 'price') {
-			$pricelist->price = $price_chgmt;
-		}
-
-		$pricelist->reason =$reason;
-		$pricelist->date_start =$date_start;
-
-		$pricelist->create($user);
-		*/
 	}
 }
 
