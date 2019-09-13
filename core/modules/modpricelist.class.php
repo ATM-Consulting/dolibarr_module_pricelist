@@ -178,31 +178,7 @@ class modpricelist extends DolibarrModules
 		$this->menu = array();			// List of menus to add
 
 		// Add here entries to declare new menus
-		$r=0;
-		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=products',
-			'type'=>'left',
-			'titre'=>'PriceList',
-			'mainmenu'=>'products',
-			'leftmenu'=>'pricelist',
-			'url'=>'/pricelist/changeprice.php?leftmenu=pricelistjoss',
-			'langs'=>'pricelist@pricelist',
-			'position'=>100+$r, 'enabled'=>'1',
-			'perms'=>'1',
-			'target'=>'', 'user'=>2);
-		$r++;
 
-		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=products,fk_leftmenu=pricelist',
-			'type'=>'left',
-			'titre'=>'changePrice',
-			'mainmenu'=>'',
-			'leftmenu'=>'',
-			'url'=>'/pricelist/changeprice.php',
-			'langs'=>'pricelist@pricelist',
-			'position'=>100+$r, 'enabled'=>'1',
-			'perms'=>'1',
-			'target'=>'', 'user'=>2);
-
-		$r++;
 
 		// Exports
 		$r=1;
