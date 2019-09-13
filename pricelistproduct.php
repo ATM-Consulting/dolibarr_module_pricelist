@@ -92,8 +92,7 @@ if ($action == 'changePriceProduct' && isset($save)){
 		$pricelist->reason =$reason;
 		$pricelist->date_start =$date_start;
 		//$pricelist->date_end =$date_end;
-
-		if ($pricelist->lastYear($fk_product)){
+		if ($pricelist->lastYear($fk_product,$date_start)){
 			$display_confirm = 1;
 		}
 		else{

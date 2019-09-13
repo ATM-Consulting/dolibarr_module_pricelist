@@ -347,17 +347,23 @@ class Pricelist extends SeedObject
 	}
 
 	/**
-	 * Product price has been modified during the past year
-	 * return : true if yes, false neither
+	 * Check if price change isn't done
+	 * @param $fk_product Product concerned
+	 * @param string $date Date start of predicted change
+	 * @return bool True = yes, False = no
 	 */
-	public function lastYear($fk_product){
+	public function lastYear($fk_product, $date = 'now'){
 		$product = new Product($this->db);
 		$product->fetch($fk_product);
-		$year = date('Y');
-		$date = $year - 1 . date('-m-d');
-		$dateStp = strtotime($date);
-
-		if ($dateStp < $product->array_options['options_last_date_price']){
+		if ($date != 'now'){
+			$dateStp = strtotime(date('Y',$date) - 1 . '-' . date('m-d',$date));
+		}
+		else {
+			$year = date('Y');
+			$date = $year - 1 . date('-m-d');
+			$dateStp = strtotime($date);
+		}
+		if ($dateStp >= $product->array_options['options_last_date_price']){
 			return true;
 		}
 		return false;
