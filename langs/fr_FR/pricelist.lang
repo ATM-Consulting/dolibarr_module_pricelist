@@ -63,7 +63,7 @@ PriceListChangePrice=Augmenter le prix de %s&#x25;
 PriceListeAugmentationMassValue=Augmentation en masse (en pourcentage)
 
 
-MassActionChangePrice=Augmentation du prix en masse;
+MassActionChangePrice=Augmentation du prix en masse
 DeleteConfirm=Confirmation suppression
 DeleteConfirmQuestion=Voulez-vous vraiment supprimer les tarifs sélectionnés ?
 
@@ -82,3 +82,6 @@ NoPriceList=Aucun prix
 
 confirmDateQuestion=Voulez-vous réellement modifier le prix de nouveau ?
 confirmDate=Le prix de vente a déjà été modifié au cours de la dernière année
+
+
+massactionUpdateMessage=%s Prix modifiés, %s Prix ignorés <br /><small>(Les prix modifiés depuis moins d'un an doivent être modifiés sur la fiche produit, onglet Grille Tarifaire)</small>

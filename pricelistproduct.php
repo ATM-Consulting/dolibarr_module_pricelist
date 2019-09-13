@@ -146,6 +146,8 @@ print '<tr><td>'.$langs->trans("SellingPrice").'</td><td>'.price($object->price)
 print '<tr><td>'.$langs->trans("Status").' ('.$langs->trans("Sell").')</td><td>';
 print $object->getLibStatut(2,0);
 print '</td></tr>';
+// Description
+print '<tr><td>'.$langs->trans("Description").'</td><td>'.$object->array_options['options_description_pricelist'].'</td></tr>';
 
 print "</table>\n";
 

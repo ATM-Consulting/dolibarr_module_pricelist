@@ -103,16 +103,32 @@ class Actionspricelist
 				dol_include_once('abricot/includes/class/class.seedobject.php');
 				dol_include_once('comm/action/class/actioncomm.class.php');
 				dol_include_once('pricelist/class/pricelist.class.php');
+				$now = strtotime(date("Y-m-d"));
+				$updated = 0;
+				$notUpdated = 0;
 				foreach ($parameters['toselect'] as $selectId){
-					$pricelist = new Pricelist($db);
+					$product = new Product($db);
+					$product->fetch($selectId);
+					$last = $product->array_options['options_last_date_price'];
+					$next = strtotime(date('Y',$last) + 1 . '-' . date('m-d',$last));
 
-					$pricelist->fk_product = $selectId;
-					$pricelist->reduction = $conf->global->PRICELISTPOURCENTAGEMASSACTION;
-					$pricelist->date_start = strtotime(date("Y-m-d"));
-					$pricelist->reason = $langs->trans('MassActionChangePrice');
+					if ($last == '' || $next <= $now){
+						$pricelist = new Pricelist($db);
 
-					$pricelist->create($user);
+						$pricelist->fk_product = $selectId;
+						$pricelist->reduction = $conf->global->PRICELISTPOURCENTAGEMASSACTION;
+						$pricelist->date_start = $now;
+						$pricelist->reason = $langs->trans('MassActionChangePrice');
+
+						$pricelist->create($user);
+						$updated++;
+					}
+					else {
+						$notUpdated++;
+					}
+
 				}
+				setEventMessage($langs->trans('massactionUpdateMessage',$updated,$notUpdated));
 			}
 		}
 

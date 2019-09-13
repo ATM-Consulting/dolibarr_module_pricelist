@@ -240,7 +240,7 @@ class Interfacepricelisttrigger
         	global $db;
         	dol_include_once('pricelist/class/pricelist.class.php');
 			$pricelist = new Pricelist($db);
-        	$pricelist->deleteAllOfProduct($object->id);
+        	$pricelist->deleteAllOfProduct($user, $object->id);
 			dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
@@ -342,7 +342,10 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'LINEPROPAL_INSERT') {
-        	$object->descritpion = $object->fact_desc;
+			if ($object->product_type == '1'){
+				$object = $this->changeDesc($object,'pr');
+				$object->update($user);
+			}
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
@@ -618,16 +621,16 @@ class Interfacepricelisttrigger
 			$product->fetch($object->fk_product);
 			switch ($context){
 				case 'facture':
-					$object->desc = $product->array_options['options_descritpion_facture'];
+					$object->desc = $product->array_options['options_description_facture'];
 					return $object;
 				case 'commande':
-					$object->desc = $product->array_options['options_descritpion_commande'];
+					$object->desc = $product->array_options['options_description_commande'];
 					return $object;
 				case 'pricelist':
-					$object->desc = $product->array_options['options_descritpion_pricelist'];
+					$object->desc = $product->array_options['options_description_pricelist'];
 					return $object;
-				case 'devis':
-					$object->desc = $product->array_options['options_descritpion_devis'];
+				case 'pr':
+					$object->desc = $product->array_options['options_description_devis'];
 					return $object;
 			}
 		}
