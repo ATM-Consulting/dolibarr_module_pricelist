@@ -174,6 +174,7 @@ class Pricelist extends SeedObject
 		if ($this->date_start == $now){ //Change immediatly the price
 			$product = new Product($this->db);
 			$product->fetch($this->fk_product);
+			var_dump($product->array_options);
 			if ($this->reduction != ''){
 				$new_price_min = $product->price_min + $product->price_min * $this->reduction/100;
 				$new_price = $product->price + $product->price * $this->reduction/100;
@@ -184,8 +185,14 @@ class Pricelist extends SeedObject
 			}
 			$product->updatePrice($new_price, 'HT', $user,'',$new_price_min);
 
-			$product->array_options['options_last_date_price'] = $this->date_start;
-			$product->updateExtraField('last_date_price');
+			if (isset($product->array_options['options_last_date_price'])){
+				$product->array_options['options_last_date_price'] = $this->date_start;
+				$product->updateExtraField('last_date_price');
+			}
+			else {
+				$product->array_options['options_last_date_price'] = $this->date_start;
+				$product->insertExtraFields('',$user);
+			}
 		}
 		return parent::create($user);
 	}
