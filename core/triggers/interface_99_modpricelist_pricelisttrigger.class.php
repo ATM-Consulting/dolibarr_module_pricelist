@@ -272,10 +272,8 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'LINEORDER_INSERT') {
-			if ($object->product_type == '1'){
-				$object = $this->changeDesc($object,'commande');
-				$object->update($user);
-			}
+			$object = $this->changeDesc($object,'order');
+			$object->update($user);
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
@@ -342,10 +340,8 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'LINEPROPAL_INSERT') {
-			if ($object->product_type == '1'){
-				$object = $this->changeDesc($object,'pr');
-				$object->update($user);
-			}
+			$object = $this->changeDesc($object,'propal');
+			$object->update($user);
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
@@ -420,10 +416,8 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'LINEBILL_INSERT') {
-        	if ($object->product_type == '1'){
-				$object = $this->changeDesc($object,'facture');
-				$object->update($user);
-			}
+			$object = $this->changeDesc($object,'bill');
+			$object->update($user);
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
@@ -615,12 +609,14 @@ class Interfacepricelisttrigger
 	 */
 	private function changeDesc($object,$context = 'default')
 	{
+		/*
 		global $db;
 		if (! empty($object->fk_product)){
 			$product = new Product($db);
 			$product->fetch($object->fk_product);
 			switch ($context){
 				case 'facture':
+
 					$object->desc = $product->array_options['options_description_facture'];
 					return $object;
 				case 'commande':
@@ -633,7 +629,7 @@ class Interfacepricelisttrigger
 					$object->desc = $product->array_options['options_description_devis'];
 					return $object;
 			}
-		}
+		}*/
 		return $object;
 	}
 }
