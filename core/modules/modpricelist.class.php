@@ -221,8 +221,8 @@ class modpricelist extends DolibarrModules
 
 		$extrafields = new ExtraFields($db);
 
-		//$result = $extrafields->addExtraField('desc_uniteFacturation', 'Unité de facturation', 'html', 101, 1024, 'product');
-		//$result = $extrafields->addExtraField('desc_NoteSpec', 'Notes spécifiques', 'html', 102, 1024, 'product');
+		$result = $extrafields->addExtraField('desc_uniteFacturation', 'Unité de facturation', 'html', 101, 1024, 'product');
+		$result = $extrafields->addExtraField('desc_NoteSpec', 'Notes spécifiques (Grilles Tarifaires)', 'html', 102, 1024, 'product');
 
 		$result = $extrafields->addExtraField('last_date_price', 'Date dernière modification du prix', 'date', 105, 1024, 'product',0,0,'','',1,'','2');
 

@@ -59,7 +59,7 @@ changePrice=Modification prix de vente
 Pricelist = Grille Tarifaire
 
 # Massaction
-PriceListChangePrice=Augmenter le prix de %s&#x25;
+PriceListChangePrice=Augmenter le prix de %s
 PriceListeAugmentationMassValue=Augmentation en masse (en pourcentage)
 
 

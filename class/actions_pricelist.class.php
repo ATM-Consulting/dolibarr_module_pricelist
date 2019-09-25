@@ -71,7 +71,7 @@ class Actionspricelist
 		$error = 0; // Error counter
 
 		if (strpos($parameters['context'], 'productservicelist') !== false) {
-			$this->resprints = '<option value="PriceListChangePrice">' . $langs->trans("PriceListChangePrice",$conf->global->PRICELISTPOURCENTAGEMASSACTION) . '</option>';
+			$this->resprints = '<option value="PriceListChangePrice">' . $langs->trans("PriceListChangePrice",$conf->global->PRICELISTPOURCENTAGEMASSACTION.'%') . '</option>';
 		}
 
 		if (!$error) {

@@ -146,7 +146,7 @@ print '<tr><td>'.$langs->trans("Status").' ('.$langs->trans("Sell").')</td><td>'
 print $object->getLibStatut(2,0);
 print '</td></tr>';
 // Description
-print '<tr><td>'.$langs->trans("Description").'</td><td>'.$object->array_options['options_description_pricelist'].'</td></tr>';
+print '<tr><td>'.$langs->trans("Description").'</td><td>'.$object->description.'</td></tr>';
 
 print "</table>\n";
 
@@ -273,9 +273,7 @@ print $listview->renderArray($db, $TPricelist, array(
 //		, 'status' => array('search_type' => Pricelist::$TStatus, 'to_translate' => true) // select html, la clé = le status de l'objet, 'to_translate' à true si nécessaire
 	)
 	, 'translate' => array()
-	, 'hide' => array(
-		'rowid' // important : rowid doit exister dans la query sql pour les checkbox de massaction
-	)
+
 	, 'list' => array(
 		'title' => $langs->trans('PriceList')
 		, 'image' => 'title_generic.png'

@@ -174,7 +174,6 @@ class Pricelist extends SeedObject
 		if ($this->date_start == $now){ //Change immediatly the price
 			$product = new Product($this->db);
 			$product->fetch($this->fk_product);
-			var_dump($product->array_options);
 			if ($this->reduction != ''){
 				$new_price_min = $product->price_min + $product->price_min * $this->reduction/100;
 				$new_price = $product->price + $product->price * $this->reduction/100;

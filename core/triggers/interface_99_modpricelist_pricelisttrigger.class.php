@@ -597,11 +597,6 @@ class Interfacepricelisttrigger
         return 0;
     }
 
-
-	/**
-	 * TODO Voir trigger devis et grille tarifaire
-	 *
-	 */
 	/**
 	 * @param $object
 	 * @param string $context
@@ -609,27 +604,36 @@ class Interfacepricelisttrigger
 	 */
 	private function changeDesc($object,$context = 'default')
 	{
-		/*
 		global $db;
+		$separator = "\n";
+
 		if (! empty($object->fk_product)){
 			$product = new Product($db);
 			$product->fetch($object->fk_product);
-			switch ($context){
-				case 'facture':
-
-					$object->desc = $product->array_options['options_description_facture'];
+			if ($context == 'pricelist'){
+				if ($product->description == ''){
+					$object->desc = $product->array_options['options_desc_uniteFacturation'];
 					return $object;
-				case 'commande':
-					$object->desc = $product->array_options['options_description_commande'];
+				}
+				if ($product->array_options['options_desc_uniteFacturation'] == ''){
 					return $object;
-				case 'pricelist':
-					$object->desc = $product->array_options['options_description_pricelist'];
-					return $object;
-				case 'pr':
-					$object->desc = $product->array_options['options_description_devis'];
-					return $object;
+				}
+				$object->desc .= $separator . $product->array_options['options_desc_uniteFacturation'];
+				return $object;
 			}
-		}*/
+			else {
+				if ($product->array_options['options_desc_uniteFacturation'] == ''){
+					$object->desc = $product->array_options['options_desc_NoteSpec'];
+					return $object;
+				}
+				if ($product->array_options['options_desc_NoteSpec'] == ''){
+					$object->desc = $product->array_options['options_desc_uniteFacturation'];
+					return $object;
+				}
+				$object->desc = $product->array_options['options_desc_uniteFacturation'] . $separator . $product->array_options['options_desc_NoteSpec'];
+				return $object;
+			}
+		}
 		return $object;
 	}
 }
