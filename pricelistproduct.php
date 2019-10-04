@@ -37,6 +37,7 @@ $date_end = strtotime($date_end_year.'-'.$date_end_month.'-'.$date_end_day);*/
 $pricelist = new Pricelist($db);
 $product = new Product($db);
 $result=$product->fetch($fk_product);
+$hookmanager->initHooks(array('pricelistproduct'));
 
 $object = $product;
 $display_confirm = 0;
