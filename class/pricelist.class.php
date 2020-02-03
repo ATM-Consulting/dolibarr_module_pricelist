@@ -128,25 +128,27 @@ class Pricelist extends SeedObject
 	}
 
 	/**
-	 * @param User $user User object
-	 * @return int
+	 * @param	User	$user		User object
+	 * @param 	bool 	$notrigger  false=launch triggers after, true=disable triggers
+	 * @return  int
 	 */
-	public function save($user)
+	public function save($user, $notrigger = false)
 	{
-		return $this->create($user);
+		return $this->create($user, $notrigger);
 	}
 
 	/**
 	 * Delete pricelist
-	 * @param User $user User object
-	 * @return int
+	 * @param   User	$user		User object
+	 * @param 	bool 	$notrigger  false=launch triggers after, true=disable triggers
+	 * @return  int
 	 */
-	public function delete(User &$user)
+	public function delete(User &$user, $notrigger = false)
 	{
 		$this->deleteObjectLinked();
 
 		unset($this->fk_element); // avoid conflict with standard Dolibarr comportment
-		return parent::delete($user);
+		return parent::delete($user, $notrigger);
 	}
 
 	public function deleteAllOfProduct(User &$user, $fk_product){
@@ -161,10 +163,11 @@ class Pricelist extends SeedObject
 
 	/**
 	 * Create Pricelist // If start date is today, immediately changes the price of the product
-	 * @param User $user User registered
-	 * @return int return id
+	 * @param	User	$user		User registered
+	 * @param 	bool 	$notrigger  false=launch triggers after, true=disable triggers
+	 * @return	int					return id
 	 */
-	public function create(User &$user){
+	public function create(User &$user, $notrigger = false){
 		global $lang;
 		$now = strtotime(date("Y-m-d"));
 		if ($this->date_start < $now){
@@ -193,7 +196,7 @@ class Pricelist extends SeedObject
 				$product->insertExtraFields('',$user);
 			}
 		}
-		return parent::create($user);
+		return parent::create($user, $notrigger);
 	}
 
 	/**
