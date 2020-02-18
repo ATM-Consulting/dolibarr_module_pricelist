@@ -605,7 +605,7 @@ class Interfacepricelisttrigger
 	private function changeDesc($object,$context = 'default')
 	{
 		global $db;
-		$separator = "\n";
+		$separator = "<br/>";
 
 		if (! empty($object->fk_product)) {
 			$product = new Product($db);
@@ -624,11 +624,11 @@ class Interfacepricelisttrigger
 				default:
 					if ($product->array_options['options_desc_NoteSpec'] != ""){
 						$object->desc.=$separator;
-						$object->desc .= $product->array_options['options_desc_NoteSpec'];
+						$object->desc.=$product->array_options['options_desc_NoteSpec'];
 					}
 					if ($product->array_options['options_desc_uniteFacturation'] != ""){
 						$object->desc.=$separator;
-						$object->desc .= $product->array_options['options_desc_uniteFacturation'];
+						$object->desc.=$product->array_options['options_desc_uniteFacturation'];
 					}
 					break;
 			}
