@@ -607,31 +607,30 @@ class Interfacepricelisttrigger
 		global $db;
 		$separator = "\n";
 
-		if (! empty($object->fk_product)){
+		if (! empty($object->fk_product)) {
 			$product = new Product($db);
 			$product->fetch($object->fk_product);
-			if ($context == 'pricelist'){
-				if ($product->description == ''){
-					$object->desc = $product->array_options['options_desc_uniteFacturation'];
-					return $object;
-				}
-				if ($product->array_options['options_desc_uniteFacturation'] == ''){
-					return $object;
-				}
-				$object->desc .= $separator . $product->array_options['options_desc_uniteFacturation'];
-				return $object;
-			}
-			else {
-				if ($product->array_options['options_desc_uniteFacturation'] == ''){
-					$object->desc = $product->array_options['options_desc_NoteSpec'];
-					return $object;
-				}
-				if ($product->array_options['options_desc_NoteSpec'] == ''){
-					$object->desc = $product->array_options['options_desc_uniteFacturation'];
-					return $object;
-				}
-				$object->desc = $product->array_options['options_desc_uniteFacturation'] . $separator . $product->array_options['options_desc_NoteSpec'];
-				return $object;
+			switch($context){
+				case 'pricelist': //Grille Tarifaire
+					if ($product->description != ""){
+						$object->desc.=$separator;
+						$object->desc.=$product->description;
+					}
+					if ($product->array_options['options_desc_uniteFacturation'] != ""){
+						$object->desc.=$separator;
+						$object->desc.=$product->array_options['options_desc_uniteFacturation'];
+					}
+					break;
+				default:
+					if ($product->array_options['options_desc_NoteSpec'] != ""){
+						$object->desc.=$separator;
+						$object->desc .= $product->array_options['options_desc_NoteSpec'];
+					}
+					if ($product->array_options['options_desc_uniteFacturation'] != ""){
+						$object->desc.=$separator;
+						$object->desc .= $product->array_options['options_desc_uniteFacturation'];
+					}
+					break;
 			}
 		}
 		return $object;
