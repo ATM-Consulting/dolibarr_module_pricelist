@@ -170,7 +170,7 @@ if ($display_confirm){
 
 print '<table class="notopnoleftnoright" width="100%" border="0" style="margin-bottom: 2px;" summary="">';
 print '<tbody><tr>';
-print '<td class="nobordernopadding" valign="middle"><div class="titre">'.$langs->trans('ProductsPipeServices').'</div></td>';
+print '<td class="nobordernopadding" valign="middle"><div class="titre">'.$langs->trans('Pricelist').'</div></td>';
 print '</tr></tbody>';
 print '</table>';
 print '<form action="'.$_SERVER['PHP_SELF'].'?fk_product='.$fk_product.'" method="POST">';
