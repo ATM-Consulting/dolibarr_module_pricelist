@@ -272,8 +272,6 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'LINEORDER_INSERT') {
-			$object = $this->changeDesc($object,'order');
-			$object->update($user);
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
@@ -340,8 +338,6 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'LINEPROPAL_INSERT') {
-			$object = $this->changeDesc($object,'propal');
-			$object->update($user);
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
@@ -416,8 +412,6 @@ class Interfacepricelisttrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'LINEBILL_INSERT') {
-			$object = $this->changeDesc($object,'bill');
-			$object->update($user);
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
@@ -596,43 +590,4 @@ class Interfacepricelisttrigger
 
         return 0;
     }
-
-	/**
-	 * @param $object
-	 * @param string $context
-	 * @return mixed
-	 */
-	private function changeDesc($object,$context = 'default')
-	{
-		global $db;
-		$separator = "<br/>";
-
-		if (! empty($object->fk_product)) {
-			$product = new Product($db);
-			$product->fetch($object->fk_product);
-			switch($context){
-				case 'pricelist': //Grille Tarifaire
-					if ($product->description != ""){
-						$object->desc.=$separator;
-						$object->desc.=$product->description;
-					}
-					if ($product->array_options['options_desc_uniteFacturation'] != ""){
-						$object->desc.=$separator;
-						$object->desc.=$product->array_options['options_desc_uniteFacturation'];
-					}
-					break;
-				default:
-					if ($product->array_options['options_desc_NoteSpec'] != ""){
-						$object->desc.=$separator;
-						$object->desc.=$product->array_options['options_desc_NoteSpec'];
-					}
-					if ($product->array_options['options_desc_uniteFacturation'] != ""){
-						$object->desc.=$separator;
-						$object->desc.=$product->array_options['options_desc_uniteFacturation'];
-					}
-					break;
-			}
-		}
-		return $object;
-	}
 }
