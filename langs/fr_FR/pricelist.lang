@@ -59,7 +59,7 @@ changePrice=Modification prix de vente
 Pricelist = Grille Tarifaire
 
 # Massaction
-PriceListChangePrice=Augmenter le prix de %s
+PriceListChangePrice=Modifier le prix
 PriceListeAugmentationMassValue=Augmentation en masse (en pourcentage)
 
 
@@ -84,4 +84,4 @@ confirmDateQuestion=Voulez-vous réellement modifier le prix de nouveau ?
 confirmDate=Le prix de vente a déjà été modifié au cours de la dernière année
 
 
-massactionUpdateMessage=%s Prix modifiés, %s Prix ignorés <br /><small>(Les prix modifiés depuis moins d'un an doivent être modifiés sur la fiche produit, onglet Grille Tarifaire)</small>
+massactionUpdateMessage=%s Grilles Tarifaires modifiées, %s Produits ignorés <br /><small>(Les prix modifiés depuis moins d'un an doivent être modifiés sur la fiche produit, onglet Grille Tarifaire)</small>
