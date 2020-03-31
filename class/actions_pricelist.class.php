@@ -116,6 +116,12 @@ class Actionspricelist
 		}
 	}
 
+	/** Action change Price
+	 * @param $parameters
+	 * @param $object
+	 * @param $action
+	 * @param $hookmanager
+	 */
 	public function printFieldPreListTitle($parameters, &$object, &$action, $hookmanager){
 		$confirmChangePrice = GETPOST('confirmChangePrice');
 		if ($this->massactionChangePrice['changePrice'] && ! $confirmChangePrice){
@@ -127,6 +133,10 @@ class Actionspricelist
 		}
 	}
 
+	/**
+	 * Formulaire changement de prix en masse
+	 * @return string
+	 */
 	private function displayFormChangePrice(){
 		global $db, $langs;
 		$formA = new TFormCore($db);
@@ -145,7 +155,7 @@ class Actionspricelist
 					<tr>
 						<td>'.$langs->trans('Percent').'</td>
 						<td>
-							'.$formA->texte('','reduc_chgmt','20',null,null,'style="width:4em"').'%
+							'.$formA->texte('','reduc_chgmt','20',null,null,'required="required"; style="width:4em"').'%
 						</td>
 					</tr>
 					<tr>
@@ -157,7 +167,7 @@ class Actionspricelist
 					<tr>
 						<td>'.$langs->trans('Motif').'</td>
 						<td>
-							<textarea name="motif_changement"></textarea>
+							<textarea name="motif_changement" required="required"></textarea>
 						</td>
 					</tr>
 					<tr>
@@ -171,6 +181,9 @@ class Actionspricelist
 		return $res;
 	}
 
+	/**
+	 * Action changement de prix en masse
+	 */
 	private function changePriceMassaction(){
 		dol_include_once('pricelist/class/pricelist.class.php');
 		global $langs, $db, $user;
