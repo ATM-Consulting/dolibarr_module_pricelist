@@ -28,7 +28,14 @@ if(!defined('INC_FROM_DOLIBARR')) {
 }
 
 dol_include_once('/pricelist/class/pricelist.class.php');
+dol_include_once('/pricelist/class/pricelistMassactionIgnored.class.php');
+dol_include_once('/pricelist/class/pricelistMassaction.class.php');
 
 $o=new pricelist($db);
 $o->init_db_by_vars();
 
+$m = new PricelistMassaction($db);
+$m->init_db_by_vars();
+
+$p = new PricelistMassactionIgnored($db);
+$p->init_db_by_vars();

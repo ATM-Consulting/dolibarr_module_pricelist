@@ -19,20 +19,14 @@ $massaction=__get('massaction','list');
 $action=__get('action','list');
 $confirm=__get('confirm','no');
 
-$name_chmt = GETPOST('name_chmt','text');
+$type_chmt = GETPOST('type_chmt','text');
 $reason = GETPOST('motif_changement','text');
 $price_chgmt = GETPOST('price_chgmt','int');
 $reduc_chgmt = GETPOST('reduc_chgmt','int');
-$date_start_day = GETPOST('start_dateday','text');
-$date_start_month = GETPOST('start_datemonth','text');
-$date_start_year = GETPOST('start_dateyear','text');
-$date_start = strtotime($date_start_year.'-'.$date_start_month.'-'.$date_start_day);
-/*$date_end_day = GETPOST('end_dateday','text');
-$date_end_month = GETPOST('end_datemonth','text');
-$date_end_year = GETPOST('end_dateyear','text');
-$date_end = strtotime($date_end_year.'-'.$date_end_month.'-'.$date_end_day);*/
 
-
+$date_change = GETPOST('date_change','text');
+$date_change = str_replace('/', '-', $date_change);
+$date_change = date('Y-m-d', strtotime($date_change));
 
 $pricelist = new Pricelist($db);
 $product = new Product($db);
@@ -41,6 +35,7 @@ $hookmanager->initHooks(array('pricelistproduct'));
 
 $object = $product;
 $display_confirm = 0;
+$now = strtotime(date("Y-m-d"));
 
 $form = new Form($db);
 $formA = new TFormCore($db);
@@ -51,30 +46,9 @@ $formA = new TFormCore($db);
 
 $back = $_SERVER['PHP_SELF'].'?fk_product='.$fk_product;
 
-if ($action  == 'confirmDate' && $confirm == 'yes'){
-	$date_start = strtotime(GETPOST('date_start','text'));
-	$pricelist->fk_product = $fk_product;
-	$pricelist->reduction = '';
-	$pricelist->price = '';
-	if ($name_chmt == 'reduc') {
-		$pricelist->reduction = $reduc_chgmt;
-	}
-	if ($name_chmt == 'price') {
-		$pricelist->price = $price_chgmt;
-	}
-
-	$pricelist->reason =$reason;
-	$pricelist->date_start =$date_start;
-
-	$pricelist->create($user);
-	header("Location: ".$back);
-	exit;
-}
-
+// Pricelist form
 if ($action == 'changePriceProduct' && isset($save)){
-	$now = strtotime(date("Y-m-d"));
-
-	if ($date_start < $now){
+	if (strtotime($date_change) < $now){ // Date OK
 		setEventMessage('inferiorDateError', 'errors');
 	}
 	else{
@@ -83,29 +57,52 @@ if ($action == 'changePriceProduct' && isset($save)){
 		$pricelist->reduction = '';
 		$pricelist->price = '';
 
-		if ($name_chmt == 'reduc') {
-			$pricelist->reduction = $reduc_chgmt;
+		if ($type_chmt == 'reduc') {
+			$pricelist->reduc = $reduc_chgmt;
 		}
-		if ($name_chmt == 'price') {
+		if ($type_chmt == 'price') {
 			$pricelist->price = $price_chgmt;
 		}
 
-		$pricelist->reason =$reason;
-		$pricelist->date_start =$date_start;
-		//$pricelist->date_end =$date_end;
-		if ($pricelist->lastYear($fk_product,$date_start)){
-			$display_confirm = 1;
-		}
-		else{
+		$pricelist->reason = $reason;
+		$pricelist->date_change = $date_change;
+
+		if ($pricelist->checkDate($db,$fk_product,$date_change)){
 			$pricelist->create($user);
 			header("Location: ".$back);
 			exit;
 		}
+		else{
+			$display_confirm = 1;
+		}
 	}
 }
 
+// Confirm change price when already changed less than 1 year ago
+if ($action  == 'confirmDate' && $confirm == 'yes'){
+	$pricelist->fk_product = $fk_product;
+
+	$pricelist->reduc = '';
+	$pricelist->price = '';
+
+	if ($type_chmt == 'reduc') {
+		$pricelist->reduc = $reduc_chgmt;
+	}
+	if ($type_chmt == 'price') {
+		$pricelist->price = $price_chgmt;
+	}
+
+	$pricelist->reason = $reason;
+	$pricelist->date_change = $date_change;
+	$pricelist->create($user);
+	header("Location: ".$back);
+	exit;
+}
+
+
+// Massaction delete
 if ($action = 'massactionDeletePriceListConfirm' && $confirm == 'yes'){
-	$TSelectedPricelist = GETPOST('toselect');
+	$TSelectedPricelist = json_decode(GETPOST('toSelectConfirm'),true);
 	if (! empty($TSelectedPricelist)){
 		foreach ($TSelectedPricelist as $priceListId){
 			$pricelist->fetch($priceListId);
@@ -126,9 +123,7 @@ $titre=$langs->trans("CardProduct".$product->type);
 dol_fiche_head($head, 'pricelisttab', $titre, '0');
 
 // Card
-
 print '<table class="border" width="100%">';
-
 // Ref
 print '<tr>';
 print '<td width="15%">'.$langs->trans("Ref").'</td><td colspan="2">';
@@ -148,42 +143,44 @@ print $object->getLibStatut(2,0);
 print '</td></tr>';
 // Description
 print '<tr><td>'.$langs->trans("Description").'</td><td>'.$object->description.'</td></tr>';
-
 print "</table>\n";
 
+
 print "</div>\n";
+
 
 // Confrim Form
 if ($display_confirm){
 	print $formA->begin_form('pricelistproduct.php?fk_product='.$fk_product,'confirmDate');
-	print $formA->hidden('name_chmt',$name_chmt);
+	print $formA->hidden('type_chmt',$type_chmt);
 	print $formA->hidden('motif_changement',$reason);
 	print $formA->hidden('price_chgmt',$price_chgmt);
 	print $formA->hidden('reduc_chgmt',$reduc_chgmt);
-	print $formA->hidden('date_start',$date_start_year.'-'.$date_start_month.'-'.$date_start_day);
+	print $formA->hidden('date_change',$date_change);
 	print $form->formconfirm('pricelistproduct.php?fk_product='.$fk_product,$langs->trans('confirmDate'),$langs->trans('confirmDateQuestion'),'confirmDate',null,'yes', 0, 200, 500, '1');
 	print $formA->end_form();
 }
 
 
 // Form
-
+// Form Header
 print '<table class="notopnoleftnoright" width="100%" border="0" style="margin-bottom: 2px;" summary="">';
 print '<tbody><tr>';
 print '<td class="nobordernopadding" valign="middle"><div class="titre">'.$langs->trans('Pricelist').'</div></td>';
 print '</tr></tbody>';
 print '</table>';
-print '<form action="'.$_SERVER['PHP_SELF'].'?fk_product='.$fk_product.'" method="POST">';
+print '<form id="new_rpricelist" action="'.$_SERVER['PHP_SELF'].'?fk_product='.$fk_product.'" method="POST">';
 print '<input type="hidden" name="action" value="changePriceProduct">';
 print '<table class="border" width="100%">';
 
+// Type de changement
 print '<tr><td width="30%">';
 print $langs->trans('TypeChange');
 print '</td><td>';
 ?>
-		<input type="radio" id="id_reduc" name="name_chmt" value="reduc" onchange="handleChange();" checked>
+		<input type="radio" id="id_reduc" name="type_chmt" value="reduc" onchange="handleChange();" checked>
 		<label for="reduc"><?=$langs->trans('Percent') ?></label>
-		<input type="radio" id="id_price" name="name_chmt" value="price" onchange="handleChange();">
+		<input type="radio" id="id_price" name="type_chmt" value="price" onchange="handleChange();">
 		<label for="price"><?=$langs->trans('Price') ?></label>
 
 		<script>
@@ -203,55 +200,53 @@ print '</td><td>';
 <?php
 print '</td></tr>';
 
+// Prix
 print '<tr class = "input_price"><td width="30%">';
 print $langs->trans('Price');
 print '</td><td>';
-print $formA->texte('','price_chgmt','0',null,null,'style="width:4em"'); print 'HT';
+print $formA->texte('','price_chgmt','0',null,null,'required="required" style="width:4em"'); print 'HT';
 print '</td></tr>';
 
+// Réduc
 print '<tr class = "input_reduc"><td width="30%">';
 print $langs->trans('Percent');
 print '</td><td>';
-print $formA->texte('','reduc_chgmt','20',null,null,'style="width:4em"'); print '%';
+print $formA->texte('','reduc_chgmt','20',null,null,'required="required" style="width:4em"'); print '%';
 print '</td></tr>';
 
+// Date de début
 print '<tr><td width="30%">';
 print $langs->trans('EffectiveDate');
 print '</td><td>';
-$form->select_date('','start_date',0,0,0,'date_select',1,1);
+$form->select_date('','date_change',0,0,0,'required="required" date_select',1,1);
 print '</td></tr>';
-/*
-print '<tr><td width="30%">';
-print $langs->trans('EndEffectiveDate');
-print '</td><td>';
-$form->select_date('','end_date',0,0,1,'date_select_end',1,1);
-print '</td></tr>';
-*/
+
+// Motif
 print '<tr><td width="30%">';
 print $langs->trans('Motif');
 print '</td><td>';
-print '<textarea name="motif_changement"></textarea>';
+print '<textarea name="motif_changement" required="required"></textarea>';
 print '</td></tr>';
 
 print '</table>';
-
-print '<center><br><input type="submit" class="button" value="'.$langs->trans("Apply").'" name="save">&nbsp;';
-
+//Confirm
+print '<center><br><input type="submit" class="button" value="'.$langs->trans("Apply").'" name="save">&nbsp;</center>';
 print '</form>';
 
 //  List
-
-$TPricelist = $pricelist->getAllByProductId($fk_product);
+print '<div id="list-pricelist">';
+$TPricelist = $pricelist->getAllByProductId($db, $fk_product);
 
 dol_include_once('abricot/includes/class/class.listview.php');
 $listview = new Listview($db, 'pricelist_view');
 $nbLine = !empty($user->conf->MAIN_SIZE_LISTE_LIMIT) ? $user->conf->MAIN_SIZE_LISTE_LIMIT : $conf->global->MAIN_SIZE_LISTE_LIMIT;
 
-$formA->begin_form('massactionDeletePriceList','massactionDeletePriceList');
+print $formA->begin_form(null,'massactionDeletePriceList');
 
 if ($massaction == 'massactionDeletePriceList'){
 	$page = 'pricelistproduct.php?fk_product='.$fk_product.'&action=massactionDeletePriceList';
 	print '<div style="padding-top: 2em;">';
+	print $formA->hidden('toSelectConfirm', dol_escape_htmltag(json_encode($toselect)));
 	print $form->formconfirm($_SERVER["PHP_SELF"], $langs->trans("ConfirmMassDeletion"), $langs->trans("ConfirmMassDeletionQuestion", count($toselect)), "delete", null, '', 0, 200, 500, 1);
 	print '</div>';
 }
@@ -267,11 +262,6 @@ print $listview->renderArray($db, $TPricelist, array(
 	, 'type' => array(
 	)
 	, 'search' => array(
-//		'date_start' => array('search_type' => 'calendars', 'allow_is_null' => true)
-//		, 'tms' => array('search_type' => 'calendars', 'allow_is_null' => false)
-//		, 'ref' => array('search_type' => true, 'table' => 't', 'field' => 'ref')
-//		, 'label' => array('search_type' => true, 'table' => array('t', 't'), 'field' => array('label')) // input text de recherche sur plusieurs champs
-//		, 'status' => array('search_type' => Pricelist::$TStatus, 'to_translate' => true) // select html, la clé = le status de l'objet, 'to_translate' à true si nécessaire
 	)
 	, 'translate' => array()
 
@@ -290,10 +280,9 @@ print $listview->renderArray($db, $TPricelist, array(
 	)
 	, 'title' => array(
 		'rowid' => 'ID'
-		, 'date_start' => $langs->trans('DateStart')
-		//, 'date_end' => $langs->trans('DateEnd')
-		, 'price' => $langs->trans('NewPrice')
-		, 'reduction' => $langs->trans('Percent')
+		, 'date_change' => $langs->trans('EffectiveDate')
+		, 'price' => $langs->trans('ChangePrice')
+		, 'reduc' => $langs->trans('PercentList')
 		, 'reason' => $langs->trans('Motif')
 		, 'selectedfields' => '' // For massaction checkbox
 	)
@@ -303,6 +292,7 @@ print $listview->renderArray($db, $TPricelist, array(
 <?php
 
 $formA->end();
+print '</div>';
 
 llxFooter();
 $db->close();
