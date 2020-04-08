@@ -153,7 +153,7 @@ print "</table>\n";
 
 print "</div>\n";
 
-// Confrim Form
+// Confrim Form : confirmer changement de prix (si déjà modifié il y a - d'1 an)
 if ($display_confirm){
 	print $formA->begin_form('pricelistproduct.php?fk_product='.$fk_product,'confirmDate');
 	print $formA->hidden('name_chmt',$name_chmt);
@@ -206,13 +206,13 @@ print '</td></tr>';
 print '<tr class = "input_price"><td width="30%">';
 print $langs->trans('Price');
 print '</td><td>';
-print $formA->texte('','price_chgmt','0',null,null,'style="width:4em"'); print 'HT';
+print $formA->texte('','price_chgmt','0',null,null,'required="required" style="width:4em"'); print 'HT';
 print '</td></tr>';
 
 print '<tr class = "input_reduc"><td width="30%">';
 print $langs->trans('Percent');
 print '</td><td>';
-print $formA->texte('','reduc_chgmt','20',null,null,'style="width:4em"'); print '%';
+print $formA->texte('','reduc_chgmt','20',null,null,'required="required" style="width:4em"'); print '%';
 print '</td></tr>';
 
 print '<tr><td width="30%">';
@@ -230,7 +230,7 @@ print '</td></tr>';
 print '<tr><td width="30%">';
 print $langs->trans('Motif');
 print '</td><td>';
-print '<textarea name="motif_changement"></textarea>';
+print '<textarea name="motif_changement" required="required"></textarea>';
 print '</td></tr>';
 
 print '</table>';
