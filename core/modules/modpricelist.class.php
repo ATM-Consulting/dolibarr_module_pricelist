@@ -174,23 +174,24 @@ class modpricelist extends DolibarrModules
 		$r++;
 */
 
-		// Main menu entries
-		// Example to declare a Left Menu entry into an existing Top menu entry:
-		$this->menu=array(
-			array(	'fk_menu'=>'fk_mainmenu=product,fk_leftmenu=pricelist',
-									'type'=>'left',
-									'titre'=>'Modifications en masse',
-									'mainmenu'=>'pricelist',
-									'leftmenu'=>'pricelist',
-									'url'=>'/pricelist/massactionPricelistList.php',
-									'langs'=>'pricelist@pricelist',
-									'position'=>100,
-									'enabled'=>1,//'$conf->pricelist->enabled'
-									'perms'=>'1',
-									'target'=>'',
-									'user'=>1
-			)
+		// Menu entries
+		$this->menu = array();
+		$r=0;
+		$this->menu[$r] = array(
+			'fk_menu'=>'fk_mainmenu=products',
+			'type'=>'left',
+			'titre'=>'Modifications en masse',
+			'mainmenu'=>'products',
+			'leftmenu'=>'pricelist',
+			'url'=>'/pricelist/massactionPricelistList.php',
+			'langs'=>'pricelist@pricelist',
+			'position'=>50,
+			'enabled'=>'1', //'$conf->pricelist->enabled'
+			'perms'=>'1',
+			'target'=>'',
+			'user'=> '0' // 0=Menu for internal users, 1=external users, 2=both
 		);
+		$r++;
 
 		// Add here entries to declare new menus
 
