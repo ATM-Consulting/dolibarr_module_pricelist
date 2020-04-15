@@ -73,6 +73,20 @@ class PricelistMassaction extends SeedObject
 	 */
 	public function delete(User &$user, $notrigger = false)
 	{
+		$TPricelists = Pricelist::getAllOfMassaction($this->db,$this->id);
+		$TPricelistsIgnored = PricelistMassactionIgnored::getAllByMassaction($this->db,$this->id);
+
+		foreach ($TPricelists as $pricelist){
+			$objectPricelsit = new Pricelist($this->db);
+			$objectPricelsit->fetch($pricelist['rowid']);
+			$objectPricelsit->delete($user);
+		}
+		foreach ($TPricelistsIgnored as $pricelistIgnored){
+			$objectPricelistIgnored = new PricelistMassactionIgnored($this->db);
+			$objectPricelistIgnored->fetch($pricelistIgnored['rowid']);
+			$objectPricelistIgnored->delete($user);
+		}
+
 		$this->deleteObjectLinked();
 
 		unset($this->fk_element); // avoid conflict with standard Dolibarr comportment
@@ -89,6 +103,21 @@ class PricelistMassaction extends SeedObject
 		return parent::create($user, $notrigger);
 	}
 
+	/** FetchAll Massactions
+	 * @param int $limit
+	 * @param bool $loadChild
+	 * @param array $TFilter
+	 * @return array all pricelist massactions
+	 */
+	public function fetchAll($limit = 0, $loadChild = true, $TFilter = array())
+	{
+		$TMassactions = parent::fetchAll($limit, $loadChild, $TFilter);
+		foreach ($TMassactions as $index => $massaction){
+			$TMassactions[$index]->date_change = date("d/m/Y",$massaction->date_change);
+		}
+		return $TMassactions;
+	}
+
 	/** getNom
 	 * @param int $withpicto Add picto into link
 	 * @param string $moreparams Add more parameters in the URL
@@ -99,10 +128,10 @@ class PricelistMassaction extends SeedObject
 		global $langs;
 
 		$result = '';
-		$label = '<u>' . $langs->trans("Showpricelist") . '</u>';
+		$label = '<u>' . $langs->trans("ShowMassactionPricelist") . '</u>';
 
 		$linkclose = '" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip">';
-		$link = '<a href="' . dol_buildpath('/pricelist/card.php', 1) . '?id=' . $this->id . urlencode($moreparams) . $linkclose;
+		$link = '<a href="' . dol_buildpath('/pricelist/massactionPricelist.php', 1) . '?id=' . $this->id . urlencode($moreparams) . $linkclose;
 
 		$linkend = '</a>';
 
@@ -111,7 +140,7 @@ class PricelistMassaction extends SeedObject
 		if ($withpicto) $result .= ($link . img_object($label, $picto, 'class="classfortooltip"') . $linkend);
 		if ($withpicto && $withpicto != 2) $result .= ' ';
 
-		$result .= $link . $this->ref . $linkend;
+		$result .= $link . $this->date_change . $linkend;
 
 		return $result;
 	}
@@ -131,5 +160,12 @@ class PricelistMassaction extends SeedObject
 		$object->fetch($id, false, $ref);
 
 		return $object->getNomUrl($withpicto, $moreparams);
+	}
+
+	/** To know if massaction already changed the price
+	 * @return bool (true = yes, false = no)
+	 */
+	public function isPassed(){
+		return (date("Y-m-d") >= date("Y-m-d",$this->date_change));
 	}
 }

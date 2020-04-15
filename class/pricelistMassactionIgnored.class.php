@@ -128,4 +128,40 @@ class PricelistMassactionIgnored extends SeedObject
 		return $object->getNomUrl($withpicto, $moreparams);
 	}
 
+	/** Get all pricelists Ignored of a massactioon
+	 * @param $db
+	 * @param $id int ID of massaction
+	 * @return array all pricelists
+	 */
+	public static function getAllByMassaction($db, $id)
+	{
+		$sql = 'SELECT';
+		$sql.= ' rowid';
+		$sql.= ' ,fk_product';
+		$sql.= ' ,fk_massaction';
+		$sql.= ' FROM '.MAIN_DB_PREFIX.'pricelist_massaction_ignored';
+		$sql.= ' WHERE fk_massaction='.$id;
+
+		$TPricelist = array();
+
+		$resql=$db->query($sql);
+		if ($resql)
+		{
+			$num = $db->num_rows($resql);
+			$i = 0;
+			while ($i < $num)
+			{
+				$obj = $db->fetch_object($resql);
+				if ($obj)
+				{
+					$TPricelist[$obj->rowid]['rowid'] = $obj->rowid;
+					$TPricelist[$obj->rowid]['fk_product'] = $obj->fk_product;
+					$TPricelist[$obj->rowid]['fk_massaction'] = $obj->fk_massaction;
+				}
+				$i++;
+			}
+		}
+
+		return $TPricelist;
+	}
 }

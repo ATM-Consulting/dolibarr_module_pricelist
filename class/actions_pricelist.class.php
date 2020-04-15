@@ -204,13 +204,14 @@ class Actionspricelist
 				$pricelist->reduc = $percent;
 				$pricelist->reason = $reason;
 				$pricelist->date_change = $date_change;
+				$pricelist->fk_massaction = $plMassactionId;
 				$pricelist->create($user);
 				$updated++;
 			}
 			else {
 				$pricelistMassactionIgnored = new PricelistMassactionIgnored($db);
-				$pricelistMassactionIgnored->fk_product = $plMassactionId ;
-				$pricelistMassactionIgnored->fk_massaction = $product_id ;
+				$pricelistMassactionIgnored->fk_product = $product_id;
+				$pricelistMassactionIgnored->fk_massaction = $plMassactionId;
 				$pricelistMassactionIgnored->create($user);
 				$ignored++;
 			}

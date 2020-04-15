@@ -47,7 +47,7 @@ class Pricelist extends SeedObject
 
 	/**
 	 * pricelist constructor.
-	 * @param DoliDB $db Database connector
+	 * @param Database $db Database connector
 	 */
 	public function __construct($db)
 	{
@@ -241,14 +241,15 @@ class Pricelist extends SeedObject
 
 	/**
 	 * Check if price change hasn't been done 1 year before the given date and isn't already planed 1 year after
-	 * @param $db DBHandler
+	 * @param $db
 	 * @param $fk_product Int fk_product concerned
 	 * @param $date_change date of predicted change
 	 * @return bool True = yes, False = no
 	 */
 	public static function checkDate($db, $fk_product, $date_change){
-		$min_date = date('Y-d-m',strtotime($date_change.' -1 year'));
-		$max_date = date('Y-d-m',strtotime($date_change.' +1 year'));
+		$min_date = date('Y-m-d',strtotime($date_change.' -1 year'));
+		$max_date = date('Y-m-d',strtotime($date_change.' +1 year'));
+		$min_date = $min_date.' 00:00:00.000';
 		$max_date = $max_date.' 23:59:59.999';
 
 		$sql = 'SELECT';
@@ -256,8 +257,7 @@ class Pricelist extends SeedObject
 		$sql.= ' FROM '.MAIN_DB_PREFIX.'pricelist';
 		$sql.= ' WHERE fk_product='.$fk_product;
 		$sql.= ' AND entity='.getEntity('products');
-		$sql.= ' AND date_change BETWEEN \''.$min_date.'\'';
-		$sql.= ' AND \''.$max_date.'\'';
+		$sql.= ' AND date_change BETWEEN \''.$min_date.'\' AND \''.$max_date.'\'';
 		$sql.= ' LIMIT 1';
 
 		$TPricelist = array();
@@ -278,5 +278,49 @@ class Pricelist extends SeedObject
 			}
 		}
 		return empty($TPricelist);
+	}
+
+	/** Get all pricelists of a massactioon
+	 * @param $db
+	 * @param $id int ID of massaction
+	 * @return array all pricelists
+	 */
+	public static function getAllOfMassaction($db, $id)
+	{
+		$sql = 'SELECT';
+		$sql.= ' rowid';
+		$sql.= ' ,fk_product';
+		$sql.= ' ,reason';
+		$sql.= ' ,date_change';
+		$sql.= ' ,fk_user';
+		$sql.= ' ,fk_massaction';
+		$sql.= ' FROM '.MAIN_DB_PREFIX.'pricelist';
+		$sql.= ' WHERE fk_massaction='.$id;
+		$sql.= ' AND entity='.getEntity('products');
+
+		$TPricelist = array();
+
+		$resql=$db->query($sql);
+		if ($resql)
+		{
+			$num = $db->num_rows($resql);
+			$i = 0;
+			while ($i < $num)
+			{
+				$obj = $db->fetch_object($resql);
+				if ($obj)
+				{
+					$TPricelist[$obj->rowid]['rowid'] = $obj->rowid;
+					$TPricelist[$obj->rowid]['fk_product'] = $obj->fk_product;
+					$TPricelist[$obj->rowid]['reason'] = $obj->reason;
+					$TPricelist[$obj->rowid]['date_change'] = $obj->date_change;
+					$TPricelist[$obj->rowid]['fk_user'] = $obj->fk_user;
+					$TPricelist[$obj->rowid]['fk_massaction'] = $obj->fk_massaction;
+				}
+				$i++;
+			}
+		}
+		return $TPricelist;
+
 	}
 }
