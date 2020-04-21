@@ -6,82 +6,80 @@ ATMAbout = Ce module a été développé par <a href="http://www.atm-consulting.
 pricelistSetup = Configuration du module Grilles Tarifaires
 pricelistAbout = A propos du module Grilles Tarifaires
 
-pricelist=pricelist
-AbricotNeedUpdate=Le module abricot doit être mis à jour
+pricelist = pricelist
+AbricotNeedUpdate = Le module abricot doit être mis à jour
 
-# SETUP
-ParamLabel=Nom du paramètre
-ParamDesc=Une description si besoin
-ParamHelp=Le contenu de l'aide
+# SETUP 
+ParamLabel = Nom du paramètre
+ParamDesc = Une description si besoin
+ParamHelp = Le contenu de l'aide
 
-# MENU
-TopMenupricelist=Grille Tarifaire
+# MENU 
+TopMenupricelist = Grille Tarifaire
 
-# STATUS
-pricelistStatusCanceled=Abandonnée (fermée)
-pricelistStatusDraft=Brouillon (à valider)
-pricelistStatusValidated=Validée (à accepter)
-pricelistStatusRefused=Refusée (fermée)
-pricelistStatusAccepted=Acceptée (fermée)
+# STATUS 
+pricelistStatusCanceled = Abandonnée (fermée)
+pricelistStatusDraft = Brouillon (à valider)
+pricelistStatusValidated = Validée (à accepter)
+pricelistStatusRefused = Refusée (fermée)
+pricelistStatusAccepted = Acceptée (fermée)
 
-pricelistStatusShortCanceled=Abandonnée
-pricelistStatusShortDraft=Brouillon
-pricelistStatusShortValidated=Validée
-pricelistStatusShortRefused=Refusée
-pricelistStatusShortAccepted=Acceptée
+pricelistStatusShortCanceled = Abandonnée
+pricelistStatusShortDraft = Brouillon
+pricelistStatusShortValidated = Validée
+pricelistStatusShortRefused = Refusée
+pricelistStatusShortAccepted = Acceptée
 
-# LIST
-pricelistList=Liste pricelist
-Nopricelist=(vide)
+# LIST 
+pricelistList = Liste pricelist
+Nopricelist = (vide)
 
-# CARD
-Newpricelist=Création pricelist
-pricelistCard=Fiche pricelist
+# CARD 
+Newpricelist = Création pricelist
+pricelistCard = Fiche pricelist
 
-pricelistModify=Modifier
-pricelistClone=Cloner
-pricelistValid=Valider
-pricelistAccept=Accepter
-pricelistRefuse=Refuser
-pricelistReopen=Rouvrir
-pricelistCancel=Abandonner
-pricelistDelete=Supprimer
+pricelistModify = Modifier
+pricelistClone = Cloner
+pricelistValid = Valider
+pricelistAccept = Accepter
+pricelistRefuse = Refuser
+pricelistReopen = Rouvrir
+pricelistCancel = Abandonner
+pricelistDelete = Supprimer
 
-ConfirmValidatepricelistTitle=Confirmation d'activation
-ConfirmValidatepricelistBody=Souhaitez-vous vraiment activer cette fiche pricelist %s ?
+ConfirmValidatepricelistTitle = Confirmation d'activation
+ConfirmValidatepricelistBody = Souhaitez-vous vraiment activer cette fiche pricelist %s ?
 
-ConfirmDeletepricelistTitle=Confirmation de suppression
-ConfirmDeletepricelistBody=Souhaitez-vous vraiment supprimer cette fiche pricelist %s ?
+ConfirmDeletepricelistTitle = Confirmation de suppression
+ConfirmDeletepricelistBody = Souhaitez-vous vraiment supprimer cette fiche pricelist %s ?
 
-# Menus
-PriceList=Grilles Tarifaires
-changePrice=Modification prix de vente
+# Menus 
+PriceList = Grilles Tarifaires
+changePrice = Modification prix de vente
 Pricelist = Grille Tarifaire
 
-# Massaction
-PriceListChangePrice=Modifier le prix
-PriceListeAugmentationMassValue=Augmentation en masse (en pourcentage)
+# Massaction 
+PriceListChangePrice = Modifier le prix
+PriceListeAugmentationMassValue = Augmentation en masse (en pourcentage)
 
+MassActionChangePrice = Augmentation du prix en masse
+DeleteConfirm = Confirmation suppression
+DeleteConfirmQuestion = Voulez-vous vraiment supprimer les tarifs sélectionnés ?
 
-MassActionChangePrice=Augmentation du prix en masse
-DeleteConfirm=Confirmation suppression
-DeleteConfirmQuestion=Voulez-vous vraiment supprimer les tarifs sélectionnés ?
+# Modif Prix Produit 
+EffectiveDate = Date de mise en application
+EndEffectiveDate = Date de fin de mise en application <br /><small>(Aucune si vide)</small>
+Motif = Motif changement de prix
+Reduction = Réduction
+Percent = Pourcentage
+TypeChange = Type de modification
+PriceBefore = Prix avant
+PriceAfter = Prix après
 
-# Modif Prix Produit
-EffectiveDate=Date de mise en application
-EndEffectiveDate=Date de fin de mise en application <br /><small>(Aucune si vide)</small>
-Motif=Motif changement de prix
-Reduction=Réduction
-Percent=Pourcentage
-TypeChange=Type de modification
-PriceBefore=Prix avant
-PriceAfter=Prix après
+inferiorDateError = Impossible de renseigner une date antérieure
+NoPriceList = Aucun prix
 
-inferiorDateError=Impossible de renseigner une date antérieure
-NoPriceList=Aucun prix
+confirmDateQuestion = Voulez-vous réellement modifier le prix de nouveau ?
+confirmDate = Le prix de vente a déjà été modifié au cours de la dernière année
 
-confirmDateQuestion=Voulez-vous réellement modifier le prix de nouveau ?
-confirmDate=Le prix de vente a déjà été modifié au cours de la dernière année
-
-
-massactionUpdateMessage=%s Grilles Tarifaires modifiées, %s Produits ignorés <br /><small>(Les prix modifiés depuis moins d'un an doivent être modifiés sur la fiche produit, onglet Grille Tarifaire)</small>
+massactionUpdateMessage = %s Grilles Tarifaires modifiées, %s Produits ignorés <br /><small>(Les prix modifiés depuis moins d'un an doivent être modifiés sur la fiche produit, onglet Grille Tarifaire)</small>
