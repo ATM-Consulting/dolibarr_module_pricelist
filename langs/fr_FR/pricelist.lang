@@ -99,3 +99,6 @@ Change=Réduction
 Passed=Modifications effectuée
 ToCome=Modifications à venir
 ToCome=Modifications à venir
+
+DeletePricelist=Suppression Grille Tarifaire
+ConfirmDeletePricelist=Êtes-vous sûr de vouloir supprimer cet enregistrement de Grille Tarifaire ?

@@ -140,7 +140,7 @@ class PricelistMassaction extends SeedObject
 		if ($withpicto) $result .= ($link . img_object($label, $picto, 'class="classfortooltip"') . $linkend);
 		if ($withpicto && $withpicto != 2) $result .= ' ';
 
-		$result .= $link . $this->date_change . $linkend;
+		$result .= $link . date('d/m/Y',$this->date_change) . $linkend;
 
 		return $result;
 	}

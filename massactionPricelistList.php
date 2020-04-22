@@ -34,9 +34,13 @@ if ($limit != ''){
 }
 $nbLine = $conf->global->PRICELIST_MASSACTION_SIZE_LISTE_LIMIT;
 
+$nbLine = GETPOST('limit');
+//if (empty($nbLine)) $nbLine = !empty($user->conf->MAIN_SIZE_LISTE_LIMIT) ? $user->conf->MAIN_SIZE_LISTE_LIMIT : $conf->global->MAIN_SIZE_LISTE_LIMIT;
+
 $page = (GETPOST("page", 'int')?GETPOST("page", 'int'):0);
 if (empty($page) || $page == -1) { $page = 0; }
 
+$nbLine = 10;
 /*
  *  ACTIONS
  */
@@ -50,47 +54,70 @@ if (empty($page) || $page == -1) { $page = 0; }
 llxHeader('',$langs->trans('MassactionsPricelist'),'','');
 
 $listview = new Listview($db, 'massaction_view');
-$nbLine = !empty($limit) ? $limit : $nbLine;
 
-$massactions = new PricelistMassaction($db);
-$TMassactions = $massactions->fetchAll();
+$sql = 'SELECT ';
+$sql.= ' rowid,';
+$sql.= ' reduc,';
+$sql.= ' reason,';
+$sql.= ' date_change';
+$sql.= ' FROM '.MAIN_DB_PREFIX.'pricelist_massaction';
 
-
-foreach ($TMassactions as $id => $massaction){
-	$TMassactions[$id]->ref = $massaction->getNomURL();
-}
-
-print $listview->renderArray($db, $TMassactions, array(
-	'view_type' => 'list'
-	, 'allow-fields-select' => false
-	, 'limit' => array(
+$listConfig = array(
+	'view_type' => 'list' // default = [list], [raw], [chart]
+	,'allow-fields-select' => false
+	,'limit'=>array(
 			'nbLine' => $nbLine
-			,'page' => $page
+			,'page'
 		)
-	, 'subQuery' => array()
-	, 'link' => array()
-	, 'type' => array()
-	, 'search' => array()
-	, 'translate' => array()
-
-	, 'list' => array(
+	,'list' => array(
 			'title' => $langs->trans('PriceListMassactions')
-		, 'image' => 'title_generic.png'
-		, 'picto_precedent' => '<'
-		, 'picto_suivant' => '>'
-		, 'noheader' => 0
-		, 'messageNothing' => $langs->trans('NoPriceListMassactions')
-		, 'picto_search' => img_picto('', 'search.png', '', 0)
+		,'image' => 'title_generic.png'
+		,'picto_precedent' => '<'
+		,'picto_suivant' => '>'
+		,'noheader' => 0
+		,'messageNothing' => $langs->trans('NoPriceListMassactions')
+		,'picto_search' => img_picto('', 'search.png', '', 0)
+		,'massactions'=>array()
 		)
-	, 'title' => array(
-		'ref' => $langs->trans('EffectiveDate')
+	,'subQuery' => array()
+	,'link' => array(
+
+	)
+	,'type' => array(
+			'date_change' => 'date'
+		)
+	,'search' => array(
+		'date_change' => array('search_type' => 'calendars', 'allow_is_null' => true)
+		)
+	,'translate' => array()
+	,'hide' => array(
+			'rowid' // important : rowid doit exister dans la query sql pour les checkbox de massaction
+		)
+	,'title'=>array(
+		'date_change' => $langs->trans('EffectiveDate')
 		, 'reduc' => $langs->trans('PercentList')
 		, 'reason' => $langs->trans('Motif')
+	)
+	,'eval'=>array(
+		'date_change' => 'getNomUrlMassaction(@rowid@)'
 		)
-	, 'eval' => array()
-));
+);
 
 
+print '<div id="list_massactions">';
+print $formA->begin_form(null,'masssactionDeletePricelistElements');
+
+print $listview->render($sql,$listConfig);
+
+print $formA->end();
+print '</div>';
 
 llxFooter();
 $db->close();
+
+function getNomUrlMassaction($id){
+	global $db;
+	$pricelistMassactions = new PricelistMassaction($db);
+	$pricelistMassactions->fetch($id);
+	return $pricelistMassactions->getNomURL();
+}

@@ -21,22 +21,34 @@ $formA = new TFormCore($db);
 
 $id = GETPOST('id','int');
 $action = GETPOST('action','alpha');
-$selectModified = GETPOST('selectModified');
-$selectIgnored = GETPOST('selectIgnored');
+$toselect = GETPOST('toselect');
 $massaction=GETPOST('massaction','alpha');
 $pricelistMassaction->fetch($id);
-
+$confirm=__get('confirm','no');
 
 /*
  *  ACTIONS
  */
 
-if($action == 'delete' && isset($id)){
+// Suppression d'éléments dans la liste
+if ($action == 'deleteElements' && $confirm == 'yes') {
+	$TSelectedPricelist = json_decode(GETPOST('toSelectConfirm'), true);
+	if (!empty($TSelectedPricelist)) {
+		foreach ($TSelectedPricelist as $priceListId) {
+			$pricelist->fetch($priceListId);
+			$pricelist->delete($user);
+		}
+	}
+}
+
+// Suppression
+if ($action == 'confirm_delete' && isset($id)){
 	$pricelistMassaction->delete($user);
 	header("Location: massactionPricelistList.php");
 	exit;
 }
 
+// Edited les tableaux de données (pour ajouter les liens)
 function formatArray($db,array &$TPricelist){
 	$product = new Product($db);
 	foreach ($TPricelist as $id => &$pricelist){
@@ -60,8 +72,9 @@ formatArray($db,$TPricelistsIgnored);
 
 $general_propreties = array(
 	'view_type' => 'list'
-	, 'allow-fields-select' => $pricelistMassaction->isPassed()
-	, 'limit' => array()
+	, 'limit' => array(
+		'nbLine' => $nbLine
+	)
 	, 'subQuery' => array()
 	, 'link' => array()
 	, 'type' => array()
@@ -77,30 +90,35 @@ $general_propreties = array(
 		, 'picto_search' => img_picto('', 'search.png', '', 0)
 		)
 	, 'title' => array(
-			'product_link' => $langs->trans('Product')
+			'rowid' => 'ID'
+			,'product_link' => $langs->trans('Product')
 			,'product_label' => $langs->trans('Label')
 		)
 	, 'eval' => array()
 );
 
-// To allow checkboxes
-if (!$pricelistMassaction->isPassed()){
-	$general_propreties['list']['massactions'] = array('massactionDeletePriceList' => $langs->trans('Delete'));
-	$general_propreties['title']['selectedfields'] = '';
-}
-
 // Modified Products
 $modified_propreties = $general_propreties;
-$general_propreties['list']['arrayofselected'] = $selectModified;
 $modified_propreties['list']['title'] = $langs->trans('ModifiedProducts');
+// To allow checkboxes only if not passed
+if (!$pricelistMassaction->isPassed()){
+	$modified_propreties['allow-fields-select'] = true;
+	$modified_propreties['list']['massactions'] = array('masssactionDeletePricelistElements' => $langs->trans('Delete'));
+	$modified_propreties['title']['selectedfields'] = $toselect;
+}
+
 
 // Ignored Products
 $ignored_propreties = $general_propreties;
-$general_propreties['list']['arrayofselected'] = $selectIgnored;
 $ignored_propreties['list']['title'] = $langs->trans('IgnoredProducts');
 
 // Header
 llxHeader('',$langs->trans('MassactionsPricelist'),'','');
+
+// Condifmation Suppression
+if($action == 'delete' && isset($id)){
+	print $form->formconfirm("massactionPricelist.php?id=".$id, $langs->trans("DeletePricelist"), $langs->trans("ConfirmDeletePricelist"), "confirm_delete", '', 0, 1);
+}
 
 // Card
 print '<table class="border" width="100%">';
@@ -133,26 +151,28 @@ else {
 	print '<div class="inline-block divButAction"><a class="butActionRefused classfortooltip" href="#" title="'.$langs->trans("MassactioinPassed").'">'.$langs->trans("Delete").'</a></div>';
 }
 
-print $formA->begin_form(null,'massactionDeletePriceList');
-
-if ($massaction == 'massactionDeletePriceList'){
-	var_dump($selectIgnored);
-	var_dump($selectModified);
-	exit;
+print '<div id="modifiedProducts">';
+print $formA->begin_form(null,'masssactionDeletePricelistElements');
+if ($massaction == 'masssactionDeletePricelistElements'){
+	print '<div style="padding-top: 2em;">';
+	print $formA->hidden('toSelectConfirm', dol_escape_htmltag(json_encode($toselect)));
+	print $form->formconfirm($_SERVER["PHP_SELF"], $langs->trans("ConfirmMassDeletion"), $langs->trans("ConfirmMassDeletionQuestion", count($toselect)), "deleteElements", null, '', 0, 200, 500, 1);
+	print '</div>';
 }
-
 // Valid products
 $listview = new Listview($db, 'modified_products');
 print $listview->renderArray($db, $TPricelists,$modified_propreties);
 
-print $formA->end_form();
-print $formA->begin_form(null,'massactionDeletePriceList');
+$formA->end();
+
+print '</div>';
+print '<div id="ignoredProducts">';
 
 // Ignored products
 $listview = new Listview($db, 'ignored_products');
 print $listview->renderArray($db, $TPricelistsIgnored, $ignored_propreties);
 
-print $formA->end_form();
+print '<div>';
 
 llxFooter();
 $db->close();
