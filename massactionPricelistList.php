@@ -34,13 +34,10 @@ if ($limit != ''){
 }
 $nbLine = $conf->global->PRICELIST_MASSACTION_SIZE_LISTE_LIMIT;
 
-$nbLine = GETPOST('limit');
-//if (empty($nbLine)) $nbLine = !empty($user->conf->MAIN_SIZE_LISTE_LIMIT) ? $user->conf->MAIN_SIZE_LISTE_LIMIT : $conf->global->MAIN_SIZE_LISTE_LIMIT;
-
 $page = (GETPOST("page", 'int')?GETPOST("page", 'int'):0);
 if (empty($page) || $page == -1) { $page = 0; }
 
-$nbLine = 10;
+
 /*
  *  ACTIONS
  */
