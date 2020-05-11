@@ -26,6 +26,8 @@ $massaction=GETPOST('massaction','alpha');
 $pricelistMassaction->fetch($id);
 $confirm=__get('confirm','no');
 
+$user = new User($db);
+
 /*
  *  ACTIONS
  */
@@ -122,9 +124,21 @@ if($action == 'delete' && isset($id)){
 
 // Card
 print '<table class="border" width="100%">';
-// Date
+// Date Demande
 print '<tr>';
-print '<td width="15%">'.$langs->trans("Date").'</td><td colspan="2">';
+print '<td width="15%">'.$langs->trans("DateRequest").'</td><td colspan="2">';
+print date('d/m/Y', $pricelistMassaction->date_creation);
+print '</td>';
+print '</tr>';
+// User
+$user->fetch($pricelistMassaction->fk_user);
+print '<tr><td>'.$langs->trans("User").'</td><td>'.$user->getNomUrl().'</td>';
+print '</tr>';
+// Separation
+print '<tr><td></td><td></td></tr>';
+// Date de mise en application
+print '<tr>';
+print '<td width="15%">'.$langs->trans("EffectiveDate").'</td><td colspan="2">';
 print date('d/m/Y', $pricelistMassaction->date_change);
 print '</td>';
 print '</tr>';
