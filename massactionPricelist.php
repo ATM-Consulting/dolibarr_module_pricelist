@@ -28,9 +28,16 @@ $confirm=__get('confirm','no');
 
 $user = new User($db);
 
+$hookmanager->initHooks(array('pricelistcard'));
+
 /*
  *  ACTIONS
  */
+
+$parameters=array();
+$reshook=$hookmanager->executeHooks('doActions', $parameters, $object);    // Note that $action and $object may have been modified by some hooks
+if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+
 
 // Suppression d'éléments dans la liste
 if ($action == 'deleteElements' && $confirm == 'yes') {
