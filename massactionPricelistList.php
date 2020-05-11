@@ -37,11 +37,15 @@ $nbLine = $conf->global->PRICELIST_MASSACTION_SIZE_LISTE_LIMIT;
 $page = (GETPOST("page", 'int')?GETPOST("page", 'int'):0);
 if (empty($page) || $page == -1) { $page = 0; }
 
+$hookmanager->initHooks(array('pricelistlist'));
 
 /*
  *  ACTIONS
  */
 
+$parameters=array();
+$reshook=$hookmanager->executeHooks('doActions', $parameters, $object);    // Note that $action and $object may have been modified by some hooks
+if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 /*
  * VIEW
@@ -61,9 +65,14 @@ $sql.= ' m.fk_user,';
 $sql.= ' m.date_change,';
 $sql.= ' count(distinct p.rowid) as nbok,';
 $sql.= ' count(distinct i.rowid) as nbko';
+$reshook=$hookmanager->executeHooks('printFieldListSelect', $parameters, $object);    // Note that $action and $object may have been modified by hook
+$sql.=$hookmanager->resPrint;
 $sql.= ' FROM '.MAIN_DB_PREFIX.'pricelist_massaction m';
 $sql.= ' LEFT JOIN '.MAIN_DB_PREFIX.'pricelist p ON m.rowid = p.fk_massaction';
 $sql.= ' LEFT JOIN '.MAIN_DB_PREFIX.'pricelist_massaction_ignored i ON m.rowid = i.fk_massaction';
+$parameters=array('sql' => $sql);
+$reshook=$hookmanager->executeHooks('printFieldListWhere', $parameters, $object);    // Note that $action and $object may have been modified by hook
+$sql.=$hookmanager->resPrint;
 $sql.= ' GROUP BY(m.rowid)';
 
 
@@ -116,11 +125,22 @@ $listConfig = array(
 		)
 );
 
+$parameters=array(  'listViewConfig' => $listConfig);
+$reshook=$hookmanager->executeHooks('listViewConfig',$parameters,$r);    // Note that $action and $object may have been modified by hook
+if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+if ($reshook>0)
+{
+	$listViewConfig = $hookmanager->resArray;
+}
 
 print '<div id="list_massactions">';
 print $formA->begin_form(null,'masssactionDeletePricelistElements');
 
 print $listview->render($sql,$listConfig);
+
+$parameters=array('sql'=>$sql);
+$reshook=$hookmanager->executeHooks('printFieldListFooter', $parameters, $object);    // Note that $action and $object may have been modified by hook
+print $hookmanager->resPrint;
 
 print $formA->end();
 print '</div>';
