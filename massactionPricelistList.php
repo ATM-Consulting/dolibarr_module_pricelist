@@ -53,13 +53,21 @@ llxHeader('',$langs->trans('MassactionsPricelist'),'','');
 $listview = new Listview($db, 'massaction_view');
 
 $sql = 'SELECT ';
-$sql.= ' rowid,';
-$sql.= ' reduc,';
-$sql.= ' reason,';
-$sql.= ' date_creation,';
-$sql.= ' fk_user,';
-$sql.= ' date_change';
-$sql.= ' FROM '.MAIN_DB_PREFIX.'pricelist_massaction';
+$sql.= ' m.rowid,';
+$sql.= ' m.reduc,';
+$sql.= ' m.reason,';
+$sql.= ' m.date_creation,';
+$sql.= ' m.fk_user,';
+$sql.= ' m.date_change,';
+$sql.= ' count(distinct p.rowid) as nbok,';
+$sql.= ' count(distinct i.rowid) as nbko';
+$sql.= ' FROM '.MAIN_DB_PREFIX.'pricelist_massaction m';
+$sql.= ' LEFT JOIN '.MAIN_DB_PREFIX.'pricelist p ON m.rowid = p.fk_massaction';
+$sql.= ' LEFT JOIN '.MAIN_DB_PREFIX.'pricelist_massaction_ignored i ON m.rowid = i.fk_massaction';
+$sql.= ' GROUP BY(m.rowid)';
+
+
+
 
 $listConfig = array(
 	'view_type' => 'list' // default = [list], [raw], [chart]
@@ -95,6 +103,8 @@ $listConfig = array(
 		)
 	,'title'=>array(
 		'date_change' => $langs->trans('EffectiveDate')
+		, 'nbok' => $langs->trans('NbProductsOK')
+		, 'nbko' => $langs->trans('NbProductsKO')
 		, 'date_creation' => $langs->trans('DateRequest')
 		, 'fk_user' => $langs->trans('User')
 		, 'reduc' => $langs->trans('PercentList')
