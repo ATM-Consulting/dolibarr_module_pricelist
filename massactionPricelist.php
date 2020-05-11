@@ -132,7 +132,7 @@ print '</tr>';
 print '<tr><td>'.$langs->trans("Reason").'</td><td>'.$pricelistMassaction->reason.'</td>';
 print '</tr>';
 // Changement
-print '<tr><td>'.$langs->trans("Change").'</td><td>'.vatrate($pricelistMassaction->reduc,true).'</td></tr>';
+print '<tr><td>'.$langs->trans("Percent").'</td><td>'.vatrate($pricelistMassaction->reduc,true).'</td></tr>';
 // Status (already passed or not)
 print '<tr><td>'.$langs->trans("Status").'</td><td>';
 if ($pricelistMassaction->isPassed()){
