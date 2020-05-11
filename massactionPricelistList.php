@@ -56,6 +56,8 @@ $sql = 'SELECT ';
 $sql.= ' rowid,';
 $sql.= ' reduc,';
 $sql.= ' reason,';
+$sql.= ' date_creation,';
+$sql.= ' fk_user,';
 $sql.= ' date_change';
 $sql.= ' FROM '.MAIN_DB_PREFIX.'pricelist_massaction';
 
@@ -82,6 +84,7 @@ $listConfig = array(
 	)
 	,'type' => array(
 			'date_change' => 'date'
+			,'date_creation' => 'date'
 		)
 	,'search' => array(
 		'date_change' => array('search_type' => 'calendars', 'allow_is_null' => true)
@@ -92,11 +95,14 @@ $listConfig = array(
 		)
 	,'title'=>array(
 		'date_change' => $langs->trans('EffectiveDate')
+		, 'date_creation' => $langs->trans('DateRequest')
+		, 'fk_user' => $langs->trans('User')
 		, 'reduc' => $langs->trans('PercentList')
 		, 'reason' => $langs->trans('Motif')
 	)
 	,'eval'=>array(
 		'date_change' => 'getNomUrlMassaction(@rowid@)'
+		,'fk_user' => '_getUserNomUrl(@val@)'
 		)
 );
 
@@ -117,4 +123,15 @@ function getNomUrlMassaction($id){
 	$pricelistMassactions = new PricelistMassaction($db);
 	$pricelistMassactions->fetch($id);
 	return $pricelistMassactions->getNomURL();
+}
+
+function _getUserNomUrl($fk_user)
+{
+	global $db;
+	$u = new User($db);
+	if ($u->fetch($fk_user) > 0)
+	{
+		return $u->getNomUrl(1);
+	}
+	return '';
 }
