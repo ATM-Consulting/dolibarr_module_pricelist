@@ -184,6 +184,11 @@ class Actionspricelist
 		$date_change = GETPOST('date_change','alpha');
 		$date_change = str_replace('/', '-', $date_change);
 		$date_change = date('Y-m-d', strtotime($date_change));
+		$now = date('Y-m-d');
+		if ($date_change < $now) {
+			setEventMessage('inferiorDateError', 'errors');
+			return null;
+		}
 
 		$pricelistMassaction = new PricelistMassaction($db);
 
