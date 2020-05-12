@@ -5,6 +5,7 @@ dol_include_once('pricelist/class/pricelistMassaction.class.php');
 dol_include_once('pricelist/class/pricelistMassactionIgnored.class.php');
 dol_include_once('abricot/includes/class/class.form.core.php');
 dol_include_once('product/class/product.class.php');
+dol_include_once('core/lib/admin.lib.php');
 
 if(is_file(DOL_DOCUMENT_ROOT."/lib/product.lib.php")) dol_include_once("/lib/product.lib.php");
 else dol_include_once("/core/lib/product.lib.php");
@@ -17,6 +18,7 @@ $pricelistMassaction = new PricelistMassaction($db);
 $pricelistMassactionsIgnored = new PricelistMassactionIgnored($db);
 $form = new Form($db);
 $formA = new TFormCore($db);
+$user = new User($db);
 
 
 $id = GETPOST('id','int');
@@ -26,7 +28,14 @@ $massaction=GETPOST('massaction','alpha');
 $pricelistMassaction->fetch($id);
 $confirm=__get('confirm','no');
 
-$user = new User($db);
+$limit = GETPOST('limit');
+if ($limit != ''){
+	dolibarr_set_const($db,'PRICELIST_SIZE_LISTE_LIMIT',$limit);
+}
+$nbLine = $conf->global->PRICELIST_SIZE_LISTE_LIMIT;
+
+$page = (GETPOST("page", 'int')?GETPOST("page", 'int'):0);
+if (empty($page) || $page == -1) { $page = 0; }
 
 $hookmanager->initHooks(array('pricelistcard'));
 
@@ -67,13 +76,25 @@ function formatArray($db,array &$TPricelist){
 	}
 }
 
-// Valid products
-$TPricelists = $pricelist->getAllOfMassaction($db,$id);
-formatArray($db,$TPricelists);
+// Modified Products
+$pricelistsSql = 'SELECT';
+$pricelistsSql.=' rowid,';
+$pricelistsSql.=' fk_product,';
+$pricelistsSql.=' fk_product as product_label,';
+$pricelistsSql.=' reason,';
+$pricelistsSql.=' date_change,';
+$pricelistsSql.=' fk_user,';
+$pricelistsSql.=' fk_massaction';
+$pricelistsSql.=' FROM llx_pricelist';
+$pricelistsSql.=' WHERE fk_massaction='.$pricelistMassaction->id;
 
-// Ignored products
-$TPricelistsIgnored = $pricelistMassactionsIgnored->getAllByMassaction($db,$id);
-formatArray($db,$TPricelistsIgnored);
+// Ignored Products
+$pricelistIgnoredSql = 'SELECT';
+$pricelistIgnoredSql.=' rowid,';
+$pricelistIgnoredSql.=' fk_product,';
+$pricelistIgnoredSql.=' fk_massaction';
+$pricelistIgnoredSql.=' FROM llx_pricelist_massaction_ignored';
+$pricelistIgnoredSql.=' WHERE fk_massaction='.$pricelistMassaction->id;
 
 /*
  * VIEW
@@ -83,6 +104,7 @@ $general_propreties = array(
 	'view_type' => 'list'
 	, 'limit' => array(
 		'nbLine' => $nbLine
+		,'page' => $pager
 	)
 	, 'subQuery' => array()
 	, 'link' => array()
@@ -97,13 +119,19 @@ $general_propreties = array(
 		, 'noheader' => 0
 		, 'messageNothing' => $langs->trans('NoProducts')
 		, 'picto_search' => img_picto('', 'search.png', '', 0)
+		, 'param_url' => 'id='.$pricelistMassaction->id
+		)
+	,'hide' => array(
+		'rowid'
 		)
 	, 'title' => array(
-			'rowid' => 'ID'
-			,'product_link' => $langs->trans('Product')
-			,'product_label' => $langs->trans('Label')
+		'fk_product' => $langs->trans('Product')
+		,'product_label' => $langs->trans('Label')
 		)
-	, 'eval' => array()
+	, 'eval' => array(
+		'fk_product' => '_getObjectNomUrl(\'@val@\')'
+		,'product_label' => '_getLabel(\'@val@\')'
+	)
 );
 
 // Modified Products
@@ -180,9 +208,11 @@ if ($massaction == 'masssactionDeletePricelistElements'){
 	print $form->formconfirm($_SERVER["PHP_SELF"], $langs->trans("ConfirmMassDeletion"), $langs->trans("ConfirmMassDeletionQuestion", count($toselect)), "deleteElements", null, '', 0, 200, 500, 1);
 	print '</div>';
 }
+
+
 // Valid products
 $listview = new Listview($db, 'modified_products');
-print $listview->renderArray($db, $TPricelists,$modified_propreties);
+print $listview->render($pricelistsSql,$modified_propreties);
 
 $formA->end();
 
@@ -191,9 +221,38 @@ print '<div id="ignoredProducts">';
 
 // Ignored products
 $listview = new Listview($db, 'ignored_products');
-print $listview->renderArray($db, $TPricelistsIgnored, $ignored_propreties);
+print $listview->render($pricelistIgnoredSql, $ignored_propreties);
 
 print '<div>';
 
 llxFooter();
 $db->close();
+
+
+function _getObjectNomUrl($id)
+{
+	global $db;
+
+	$p = new Product($db);
+	$res = $p->fetch($id);
+	if ($res > 0)
+	{
+		return $p->getNomUrl(1);
+	}
+
+	return '';
+}
+
+function _getLabel($id)
+{
+	global $db;
+
+	$p = new Product($db);
+	$res = $p->fetch($id);
+	if ($res > 0)
+	{
+		return $p->label;
+	}
+
+	return '';
+}
