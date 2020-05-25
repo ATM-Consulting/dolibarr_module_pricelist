@@ -3,6 +3,7 @@ require('config.php');
 dol_include_once('pricelist/class/pricelist.class.php');
 dol_include_once('/categories/class/categorie.class.php');
 dol_include_once('abricot/includes/class/class.form.core.php');
+dol_include_once('core/lib/admin.lib.php');
 
 if(is_file(DOL_DOCUMENT_ROOT."/lib/product.lib.php")) dol_include_once("/lib/product.lib.php");
 else dol_include_once("/core/lib/product.lib.php");
@@ -39,6 +40,15 @@ $now = strtotime(date("Y-m-d"));
 
 $form = new Form($db);
 $formA = new TFormCore($db);
+
+$limit = GETPOST('limit');
+if ($limit != ''){
+	dolibarr_set_const($db,'PRICELISTPRODUCT_SIZE_LISTE_LIMIT',$limit);
+}
+$nbLine = $conf->global->PRICELISTPRODUCT_SIZE_LISTE_LIMIT;
+
+$page = (GETPOST("page", 'int')?GETPOST("page", 'int'):0);
+if (empty($page) || $page == -1) { $page = 0; }
 
 /*
  *  ACTIONS
@@ -235,11 +245,23 @@ print '</form>';
 
 //  List
 print '<div id="list-pricelist">';
-$TPricelist = $pricelist->getAllByProductId($db, $fk_product);
+
+$sql = 'SELECT';
+$sql.= ' rowid,';
+$sql.= ' date_creation,';
+$sql.= ' price,';
+$sql.= ' reduc,';
+$sql.= ' reason,';
+$sql.= ' date_change,';
+$sql.= ' fk_user,';
+$sql.= ' fk_massaction';
+$sql.= ' FROM '.MAIN_DB_PREFIX.'pricelist';
+$sql.= ' WHERE fk_product='.$fk_product;
+$sql.= ' AND entity='.getEntity('products');
+$sql.= ' ORDER BY date_change DESC';
 
 dol_include_once('abricot/includes/class/class.listview.php');
 $listview = new Listview($db, 'pricelist_view');
-$nbLine = !empty($user->conf->MAIN_SIZE_LISTE_LIMIT) ? $user->conf->MAIN_SIZE_LISTE_LIMIT : $conf->global->MAIN_SIZE_LISTE_LIMIT;
 
 print $formA->begin_form(null,'massactionDeletePriceList');
 
@@ -251,20 +273,21 @@ if ($massaction == 'massactionDeletePriceList'){
 	print '</div>';
 }
 
-print $listview->renderArray($db, $TPricelist, array(
+$listConfig = array(
 	'view_type' => 'list'
 	, 'allow-fields-select' => true
 	, 'limit' => array(
-		'nbLine' => $nbLine
-	)
+			'nbLine' => $nbLine
+			,'page'
+		)
 	, 'subQuery' => array()
 	, 'link' => array()
 	, 'type' => array(
+		'date_change' => 'date'
+		,'date_creation' => 'date'
 	)
-	, 'search' => array(
-	)
+	, 'search' => array()
 	, 'translate' => array()
-
 	, 'list' => array(
 		'title' => $langs->trans('PriceList')
 		, 'image' => 'title_generic.png'
@@ -274,22 +297,23 @@ print $listview->renderArray($db, $TPricelist, array(
 		, 'messageNothing' => $langs->trans('NoPriceList')
 		, 'picto_search' => img_picto('', 'search.png', '', 0)
 		, 'massactions' => array(
-			'massactionDeletePriceList' => $langs->trans('Delete')
-		)
+				'massactionDeletePriceList' => $langs->trans('Delete')
+			)
 		, 'arrayofselected' => $toselect
-	)
+		)
 	, 'title' => array(
 		'rowid' => 'ID'
+		, 'date_creation' => $langs->trans('DateRequest')
 		, 'date_change' => $langs->trans('EffectiveDate')
 		, 'price' => $langs->trans('ChangePrice')
 		, 'reduc' => $langs->trans('PercentList')
 		, 'reason' => $langs->trans('Motif')
 		, 'selectedfields' => '' // For massaction checkbox
-	)
+		)
 	, 'eval' => array()
-));
-?>
-<?php
+);
+
+print $listview->render($sql,$listConfig);
 
 $formA->end();
 print '</div>';
