@@ -70,18 +70,11 @@ class Actionspricelist
 		global $langs;
 		$langs->load('pricelist@pricelist');
 
-		$error = 0; // Error counter
-
 		if (strpos($parameters['context'], 'productservicelist') !== false) {
 			$this->resprints = '<option value="PriceListChangePrice">' . $langs->trans("PriceListChangePrice") . '</option>';
 		}
 
-		if (!$error) {
-			return 0; // or return 1 to replace standard code
-		} else {
-			$this->errors[] = 'Error message';
-			return -1;
-		}
+		return 0; // or return 1 to replace standard code
 	}
 
 	/** Functions related to massaction
@@ -93,30 +86,21 @@ class Actionspricelist
 	 */
 	public function doMassActions($parameters, &$object, &$action, $hookmanager)
 	{
-		dol_include_once('abricot/includes/class/class.form.core.php');
-		global $user, $db, $langs, $massaction, $conf;
+		global $langs, $massaction;
 		$langs->load('pricelist@pricelist');
-
-		$error = 0; // Error counter
 
 		if (strpos($parameters['context'], 'productservicelist') !== false)
 		{
 			if ($massaction == 'PriceListChangePrice'){
-
 				$this->massactionChangePrice['changePrice'] = 1;
 				$this->massactionChangePrice['massaction'] = $massaction;
 				$this->massactionChangePrice['toselect'] = $parameters['toselect'];
 			}
 		}
-
-		if (! $error) {
-			return 0; // or return 1 to replace standard code
-		} else {
-			return -1;
-		}
+		return 0;
 	}
 
-	/** Action change Price
+	/** Hook used to display form and do action linked to massaction
 	 * @param $parameters
 	 * @param $object
 	 * @param $action
@@ -133,11 +117,11 @@ class Actionspricelist
 		}
 	}
 
-	/**
-	 * Formulaire changement de prix en masse
+	/** Fromulaire de changement de prix (massaction)
 	 * @return string
 	 */
 	private function displayFormChangePrice(){
+		dol_include_once('abricot/includes/class/class.form.core.php');
 		global $db, $langs;
 		$formA = new TFormCore($db);
 		$form = new Form($db);
@@ -155,13 +139,13 @@ class Actionspricelist
 					<tr>
 						<td>'.$langs->trans('Percent').'</td>
 						<td>
-							'.$formA->texte('','reduc_chgmt','20',null,null,'required="required"; style="width:4em"').'%
+							'.$formA->texte('','reduc_chgmt','20',null,null,'style="width:4em" required="required"').'%
 						</td>
 					</tr>
 					<tr>
 						<td>'.$langs->trans('EffectiveDate').'</td>
 						<td>
-							'.$form->select_date('','start_date',0,0,0,'date_select',1,1,1).'
+							'.$form->select_date('','date_change',0,0,0,'date_select',1,1,1).'
 						</td>
 					</tr>
 					<tr>
@@ -182,45 +166,58 @@ class Actionspricelist
 	}
 
 	/**
-	 * Action changement de prix en masse
+	 * Action liée au formulaire
 	 */
 	private function changePriceMassaction(){
 		dol_include_once('pricelist/class/pricelist.class.php');
-		global $langs, $db, $user;
+		dol_include_once('pricelist/class/pricelistMassaction.class.php');
+		dol_include_once('pricelist/class/pricelistMassactionIgnored.class.php');
+		global $db, $user,$langs;
 
-		$Tproducts = GETPOST('toselect');
+		//Tableau de produits à modifier
+		$TIDproducts = GETPOST('toselect');
+		//Réduction (en %)
 		$percent = GETPOST('reduc_chgmt','int');
-
+		//Motif de changement de prix
 		$reason = GETPOST('motif_changement','alpha');
-		if($reason == "") $reason = $langs->trans('MassActionChangePrice');
+		// Date prévue du changement (jj/mm/aaaa)
+		$date_change = GETPOST('date_change','alpha');
+		$date_change = str_replace('/', '-', $date_change);
+		$date_change = date('Y-m-d', strtotime($date_change));
+		$now = date('Y-m-d');
+		if ($date_change < $now) {
+			setEventMessage('inferiorDateError', 'errors');
+			return null;
+		}
 
-		$changeDate = GETPOST('start_date','alpha');
-		$changeDate = date('Y-m-d',strtotime($changeDate));
-
-		$today = strtotime(date("Y-m-d"));
-
-		$product = new Product($db);
-		$pricelist = new Pricelist($db);
+		$pricelistMassaction = new PricelistMassaction($db);
 
 		$updated = 0;
 		$ignored = 0;
 
-		foreach ($Tproducts as $productID){
-			$product->fetch($productID);
-			// Derniere Date de modification du prix ('' si aucune)
-			$lastPriceUpdate = $product->array_options['options_last_date_price'];
+		$pricelistMassaction->reduc = $percent;
+		$pricelistMassaction->reason = $reason;
+		$pricelistMassaction->date_change = $date_change;
+		$pricelistMassaction->fk_user = $user->id;
 
-			$next = strtotime(date('Y',$lastPriceUpdate) + 1 . '-' . date('m-d',$lastPriceUpdate));
+		$plMassactionId = $pricelistMassaction->create($user);
 
-			if (!$next || $next <= $today){
-				$pricelist->fk_product = $productID;
-				$pricelist->reduction = $percent;
-				$pricelist->date_start = strtotime($changeDate);
+		foreach ($TIDproducts as $product_id){
+			if(Pricelist::checkDate($db,$product_id,$date_change)){
+				$pricelist = new Pricelist($db);
+				$pricelist->fk_product = $product_id;
+				$pricelist->reduc = $percent;
 				$pricelist->reason = $reason;
+				$pricelist->date_change = $date_change;
+				$pricelist->fk_massaction = $plMassactionId;
 				$pricelist->create($user);
 				$updated++;
 			}
 			else {
+				$pricelistMassactionIgnored = new PricelistMassactionIgnored($db);
+				$pricelistMassactionIgnored->fk_product = $product_id;
+				$pricelistMassactionIgnored->fk_massaction = $plMassactionId;
+				$pricelistMassactionIgnored->create($user);
 				$ignored++;
 			}
 		}

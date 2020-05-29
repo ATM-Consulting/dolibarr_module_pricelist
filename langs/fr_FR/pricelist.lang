@@ -76,10 +76,34 @@ TypeChange = Type de modification
 PriceBefore = Prix avant
 PriceAfter = Prix après
 
+ChangePrice = Nouveau Prix HT(€)
+PercentList = Pourcentage (%%)
+
 inferiorDateError = Impossible de renseigner une date antérieure
 NoPriceList = Aucun prix
 
-confirmDateQuestion = Voulez-vous réellement modifier le prix de nouveau ?
-confirmDate = Le prix de vente a déjà été modifié au cours de la dernière année
+confirmDate = Une modification du prix de vente de ce produit a déjà été faite ou est déjà prévue 1 an autour de la date renseignée
+confirmDateQuestion = Confirmer le changement de prix ?
 
 massactionUpdateMessage = %s Grilles Tarifaires modifiées, %s Produits ignorés <br /><small>(Les prix modifiés depuis moins d'un an doivent être modifiés sur la fiche produit, onglet Grille Tarifaire)</small>
+
+PriceListMassactions = Actions En Masse Grilles Tarifaires
+NoPriceListMassactions = Aucune action en masse
+ShowMassactionPricelist = Afficher l'action en masse
+
+MassactioinPassed = La modification de prix a déjà été appliquée
+NoProducts = Aucun produit
+
+ModifiedProducts = Produits modifiés
+IgnoredProducts = Produits Ignorés
+Change = Réduction
+
+Passed = Modifications effectuée
+ToCome = Modifications à venir
+ToCome = Modifications à venir
+
+DeletePricelist = Suppression Grille Tarifaire
+ConfirmDeletePricelist = Êtes-vous sûr de vouloir supprimer cet enregistrement de Grille Tarifaire ?
+
+NbProductsOK = Produits modifiés
+NbProductsKO = Produits ignorés

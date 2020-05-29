@@ -174,8 +174,24 @@ class modpricelist extends DolibarrModules
 		$r++;
 */
 
-		// Main menu entries
-		$this->menu = array();			// List of menus to add
+		// Menu entries
+		$this->menu = array();
+		$r=0;
+		$this->menu[$r] = array(
+			'fk_menu'=>'fk_mainmenu=products',
+			'type'=>'left',
+			'titre'=>'Modifications en masse',
+			'mainmenu'=>'products',
+			'leftmenu'=>'pricelist',
+			'url'=>'/pricelist/massactionPricelistList.php',
+			'langs'=>'pricelist@pricelist',
+			'position'=>50,
+			'enabled'=>'1', //'$conf->pricelist->enabled'
+			'perms'=>'1',
+			'target'=>'',
+			'user'=> '0' // 0=Menu for internal users, 1=external users, 2=both
+		);
+		$r++;
 
 		// Add here entries to declare new menus
 
