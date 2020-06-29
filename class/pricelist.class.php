@@ -34,6 +34,15 @@ class Pricelist extends SeedObject
 	/** @var string $table_element Table name in SQL */
 	public $element = 'pricelist';
 
+	public $db;
+
+	public $reduc;
+	public $reason;
+	public $price;
+	public $fk_product;
+	public $fk_user;
+	public $date_change;
+
 	public $fields = array(
 		'entity'=>array('type'=>'int'),
 		'fk_product'=>array('type'=>'int'),
@@ -107,6 +116,13 @@ class Pricelist extends SeedObject
 		$this->entity = getEntity('products');
 		$now = strtotime(date("Y-m-d"));
 
+		if ($this->reduc != '') {
+			global $db;
+			$product = new Product($db);
+            $product->fetch($this->fk_product);
+            $this->price = $product->price + $product->price * ($this->reduc / 100);
+        }
+
 		if (strtotime($this->date_change) < $now){
 			return -1;
 		}
@@ -126,14 +142,9 @@ class Pricelist extends SeedObject
 		$product = new Product($this->db);
 		$product->fetch($this->fk_product);
 
-		if ($this->reduc != ''){ // Changement en %
-			$new_price_min = $product->price_min + $product->price_min * $this->reduc/100;
-			$new_price = $product->price + $product->price * $this->reduc/100;
-		}
-		else { // Changement prix de vente
-			$new_price_min = $this->price;
-			$new_price = $this->price;
-		}
+		$new_price_min = $this->price;
+		$new_price = $this->price;
+
 		$product->updatePrice($new_price, 'HT', $user,'',$new_price_min);
 
 		// Changement extrafield correspondant
