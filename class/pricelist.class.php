@@ -120,7 +120,7 @@ class Pricelist extends SeedObject
 			global $db;
 			$product = new Product($db);
             $product->fetch($this->fk_product);
-            $this->price = $product->price + $product->price * ($this->reduc / 100);
+            $this->price = round($product->price + $product->price * ($this->reduc / 100),2);
         }
 
 		if (strtotime($this->date_change) < $now){
