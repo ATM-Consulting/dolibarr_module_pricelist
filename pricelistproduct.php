@@ -310,7 +310,9 @@ $listConfig = array(
 		, 'reason' => $langs->trans('Motif')
 		, 'selectedfields' => '' // For massaction checkbox
 		)
-	, 'eval' => array()
+	, 'eval' => array(
+		'reduc' => 'computeReduc(\'@reduc@\')'
+	)
 );
 
 print $listview->render($sql,$listConfig);
@@ -321,4 +323,8 @@ print '</div>';
 llxFooter();
 $db->close();
 
+function computeReduc($value){
+	if ($value == '' || $value == 0) return "/";
+	return $value;
+}
 
