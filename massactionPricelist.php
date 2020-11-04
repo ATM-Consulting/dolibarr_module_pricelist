@@ -92,6 +92,7 @@ $pricelistsSql.=' WHERE fk_massaction='.$pricelistMassaction->id;
 $pricelistIgnoredSql = 'SELECT';
 $pricelistIgnoredSql.=' rowid,';
 $pricelistIgnoredSql.=' fk_product,';
+$pricelistIgnoredSql.=' fk_product as product_label,';
 $pricelistIgnoredSql.=' fk_massaction';
 $pricelistIgnoredSql.=' FROM llx_pricelist_massaction_ignored';
 $pricelistIgnoredSql.=' WHERE fk_massaction='.$pricelistMassaction->id;
