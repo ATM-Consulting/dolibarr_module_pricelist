@@ -5,3 +5,29 @@ ATMAbout = This module has been developed by <a href="http://www.atm-consulting.
 
 pricelistSetup = pricelist module setup
 pricelistAbout = About pricelist
+
+# SETUP 
+ParamLabel = Name of parameter
+ParamDesc = Description if needed
+ParamHelp = Help content
+
+# MENU 
+TopMenupricelist = Price list
+
+# STATUS 
+pricelistStatusCanceled = Abandoned (closed)
+pricelistStatusDraft = Draft (to be validated)
+pricelistStatusValidated = Validated (to be accepted)
+pricelistStatusRefused = Rejected (closed)
+pricelistStatusAccepted = Accepted (closed)
+
+pricelistStatusShortCanceled = Abandoned
+pricelistStatusShortDraft = Draft
+pricelistStatusShortValidated = Validated
+pricelistStatusShortRefused = Rejected
+pricelistStatusShortAccepted = Accepted
+
+# LIST 
+pricelistList = Pricelist list
+Nopricelist = (empty)
+
