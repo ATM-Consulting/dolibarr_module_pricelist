@@ -104,7 +104,7 @@ $general_propreties = array(
 	'view_type' => 'list'
 	, 'limit' => array(
 		'nbLine' => $nbLine
-		,'page' => $page
+		,'page' => $pager
 	)
 	, 'subQuery' => array()
 	, 'link' => array()
