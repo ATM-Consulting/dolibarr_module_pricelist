@@ -18,7 +18,6 @@ $pricelistMassaction = new PricelistMassaction($db);
 $pricelistMassactionsIgnored = new PricelistMassactionIgnored($db);
 $form = new Form($db);
 $formA = new TFormCore($db);
-$user = new User($db);
 
 
 $id = GETPOST('id','int');
@@ -105,7 +104,7 @@ $general_propreties = array(
 	'view_type' => 'list'
 	, 'limit' => array(
 		'nbLine' => $nbLine
-		,'page' => $pager
+		,'page' => $page
 	)
 	, 'subQuery' => array()
 	, 'link' => array()
