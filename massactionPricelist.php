@@ -18,7 +18,6 @@ $pricelistMassaction = new PricelistMassaction($db);
 $pricelistMassactionsIgnored = new PricelistMassactionIgnored($db);
 $form = new Form($db);
 $formA = new TFormCore($db);
-$user = new User($db);
 
 
 $id = GETPOST('id','int');
