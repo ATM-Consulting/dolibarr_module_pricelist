@@ -25,6 +25,7 @@ if (!class_exists('SeedObject'))
 }
 
 include_once DOL_DOCUMENT_ROOT .'/cron/class/cronjob.class.php';
+include_once DOL_DOCUMENT_ROOT .'/product/class/product.class.php';
 
 class Pricelist extends SeedObject
 {
@@ -145,12 +146,13 @@ class Pricelist extends SeedObject
 		$new_price_min = $this->price;
 		$new_price = $this->price;
 
-		$product->updatePrice($new_price, 'HT', $user,'',$new_price_min);
+		$result  = $product->updatePrice($new_price, 'HT', $user,'',$new_price_min);
 
 		// Changement extrafield correspondant
 		$product->array_options['options_last_date_price'] = $this->date_change;
 		$product->updateExtraField('last_date_price');
 
+		return $result;
 	}
 
 	/**
@@ -206,10 +208,10 @@ class Pricelist extends SeedObject
 	 * @return array of rowid of pricelists
 	 */
 	public function getAllToday(){
-		$now = date("Y-m-d").' 00:00:00';
+		$now = date("Y-m-d").' 01:00:00';
 
 		$sql = 'SELECT';
-		$sql.= ' rowid,';
+		$sql.= ' rowid ';
 		$sql.= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
 		$sql.= ' WHERE date_change="'.$now.'"';
 		$sql.= ' AND entity='.getEntity('products');
@@ -245,8 +247,8 @@ class Pricelist extends SeedObject
 			$this->fetch($idPriceList);
 			$this->updatePricePricelist();
 			$i++;
-		}
 
+		}
 		return 0;
 	}
 
