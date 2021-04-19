@@ -206,13 +206,16 @@ class Pricelist extends SeedObject
 	 * @return array of rowid of pricelists
 	 */
 	public function getAllToday(){
-		$now = date("Y-m-d").' 00:00:00';
+		$daystart = date("Y-m-d").' 00:00:00';
+                $dayend   = date("Y-m-d").' 23:59:59';
 
 		$sql = 'SELECT';
 		$sql.= ' rowid,';
 		$sql.= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
-		$sql.= ' WHERE date_change="'.$now.'"';
+		$sql.= ' WHERE date_change BETWEEN "'.$daystart.'" AND "'.$dayend.'"';
 		$sql.= ' AND entity='.getEntity('products');
+		
+		$this->output .= $sql . "\n\n";
 
 		$TPricelist = array();
 
