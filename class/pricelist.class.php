@@ -139,6 +139,10 @@ class Pricelist extends SeedObject
 		$user = new User($this->db);
 		$user->fetch($this->fk_user);
 
+		if(!class_exists('Product')){
+			include_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+		}
+
 		$product = new Product($this->db);
 		$product->fetch($this->fk_product);
 
@@ -206,16 +210,11 @@ class Pricelist extends SeedObject
 	 * @return array of rowid of pricelists
 	 */
 	public function getAllToday(){
-		$daystart = date("Y-m-d").' 00:00:00';
-                $dayend   = date("Y-m-d").' 23:59:59';
-
 		$sql = 'SELECT';
-		$sql.= ' rowid,';
+		$sql.= ' rowid';
 		$sql.= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
-		$sql.= ' WHERE date_change BETWEEN "'.$daystart.'" AND "'.$dayend.'"';
+		$sql.= ' WHERE DATE(date_change) = CURDATE()';
 		$sql.= ' AND entity='.getEntity('products');
-		
-		$this->output .= $sql . "\n\n";
 
 		$TPricelist = array();
 
@@ -233,6 +232,9 @@ class Pricelist extends SeedObject
 				}
 				$i++;
 			}
+		}
+		else{
+			$this->output .= $this->db->error() . "\n\n";
 		}
 		return $TPricelist;
 	}
