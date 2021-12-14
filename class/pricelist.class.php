@@ -148,6 +148,10 @@ class Pricelist extends SeedObject
 		$product = new Product($this->db);
 		$product->fetch($this->fk_product);
 
+		// Suite aux retours du client conf ajouter pour ne pas ecraser le prix mini par le nouveau prix
+		//
+		// une évolution sera probablement à faire pour que le prix min du produit suive l'augmentation en % du prix du produit
+		//lors d'une masse action de modification de prix qui n'entre pas dans le cadre de ce retour
 		if (empty($conf->global->PRICELIST_MIN_PRICE_TO_CURRENT_PRICE)){
 			   $new_price_min = $this->price;
 		}else{
