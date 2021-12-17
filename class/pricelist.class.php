@@ -136,6 +136,8 @@ class Pricelist extends SeedObject
 	 * updatePricePricelist function // Change Price according to Pricelist
 	 */
 	private function updatePricePricelist(){
+		global $conf;
+
 		$user = new User($this->db);
 		$user->fetch($this->fk_user);
 
@@ -146,7 +148,16 @@ class Pricelist extends SeedObject
 		$product = new Product($this->db);
 		$product->fetch($this->fk_product);
 
-		$new_price_min = $this->price;
+		// Suite aux retours du client conf ajouter pour ne pas ecraser le prix mini par le nouveau prix
+		//
+		// une évolution sera probablement à faire pour que le prix min du produit suive l'augmentation en % du prix du produit
+		//lors d'une masse action de modification de prix qui n'entre pas dans le cadre de ce retour
+		if (empty($conf->global->PRICELIST_MIN_PRICE_TO_CURRENT_PRICE)){
+			   $new_price_min = $this->price;
+		}else{
+			   $new_price_min = $product->price_min;
+		}
+
 		$new_price = $this->price;
 
 		$product->updatePrice($new_price, 'HT', $user,'',$new_price_min);

@@ -107,3 +107,6 @@ ConfirmDeletePricelist = Êtes-vous sûr de vouloir supprimer cet enregistrement
 
 NbProductsOK = Produits modifiés
 NbProductsKO = Produits ignorés
+
+PriceListMinPriceToCurrentPrice=Le nouveau prix de vente du produit établi lors d'une action de masse sur les modifications de prix, ne s'affecte pas au champs prix minimum du produit
+
