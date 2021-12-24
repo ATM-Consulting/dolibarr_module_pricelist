@@ -108,7 +108,7 @@ if(!function_exists('setup_print_title')){
 
 setup_print_input_form_part('PRICELISTPOURCENTAGEMASSACTION', $langs->trans('PriceListeAugmentationMassValue'));
 
-setup_print_on_off('PRICELIST_MIN_PRICE_TO_CURRENT_PRICE', $langs->trans('PriceListMinPriceToCurrentPrice'));
+
 
 print '</table>';
 
