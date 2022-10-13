@@ -142,6 +142,18 @@ print $hookmanager->resPrint;
 print $formA->end();
 print '</div>';
 
+print '<script>
+            $(document).ready(function(){
+                
+                $("[name=\"button_removefilter\"").click(function(e){
+                    e.preventDefault();
+                    window.location = "'.$_SERVER['PHP_SELF'].'";
+                });
+                
+            });
+
+        </script>';
+
 llxFooter();
 $db->close();
 
