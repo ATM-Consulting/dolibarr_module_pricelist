@@ -62,20 +62,14 @@ $sql.= ' m.reduc,';
 $sql.= ' m.reason,';
 $sql.= ' m.date_creation,';
 $sql.= ' m.fk_user,';
-$sql.= ' m.date_change,';
-$sql.= ' count(distinct p.rowid) as nbok,';
-$sql.= ' count(distinct i.rowid) as nbko';
+$sql.= ' m.date_change';
 $reshook=$hookmanager->executeHooks('printFieldListSelect', $parameters, $object);    // Note that $action and $object may have been modified by hook
 $sql.=$hookmanager->resPrint;
 $sql.= ' FROM '.MAIN_DB_PREFIX.'pricelist_massaction m';
-$sql.= ' LEFT JOIN '.MAIN_DB_PREFIX.'pricelist p ON m.rowid = p.fk_massaction';
-$sql.= ' LEFT JOIN '.MAIN_DB_PREFIX.'pricelist_massaction_ignored i ON m.rowid = i.fk_massaction';
+$sql.= ' WHERE 1 = 1';
 $parameters=array('sql' => $sql);
 $reshook=$hookmanager->executeHooks('printFieldListWhere', $parameters, $object);    // Note that $action and $object may have been modified by hook
 $sql.=$hookmanager->resPrint;
-$sql.= ' GROUP BY(m.rowid)';
-
-
 
 
 $listConfig = array(
@@ -122,7 +116,10 @@ $listConfig = array(
 	,'eval'=>array(
 		'date_change' => 'getNomUrlMassaction(@rowid@)'
 		,'fk_user' => '_getUserNomUrl(@val@)'
+        ,'nbok' => '_getCount("pricelist", @rowid@)'
+        ,'nbko' => '_getCount("pricelist_massaction_ignored", @rowid@)'
 		)
+    ,'sortfield' => 'date_change'
 );
 
 $parameters=array(  'listViewConfig' => $listConfig);
@@ -130,7 +127,7 @@ $reshook=$hookmanager->executeHooks('listViewConfig',$parameters,$r);    // Note
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 if ($reshook>0)
 {
-	$listViewConfig = $hookmanager->resArray;
+    $listConfig = $hookmanager->resArray;
 }
 
 print '<div id="list_massactions">';
@@ -145,9 +142,25 @@ print $hookmanager->resPrint;
 print $formA->end();
 print '</div>';
 
+print '<script>
+            $(document).ready(function(){
+                
+                $("[name=\"button_removefilter\"").click(function(e){
+                    e.preventDefault();
+                    window.location = "'.$_SERVER['PHP_SELF'].'";
+                });
+                
+            });
+
+        </script>';
+
 llxFooter();
 $db->close();
-
+/**
+ * genérer un getNomUrl pour les massactions
+ * @param int $id
+ * @return string
+ */
 function getNomUrlMassaction($id){
 	global $db;
 	$pricelistMassactions = new PricelistMassaction($db);
@@ -155,6 +168,11 @@ function getNomUrlMassaction($id){
 	return $pricelistMassactions->getNomURL();
 }
 
+/**
+ * genérer un getNomUrl pour les user
+ * @param int $fk_user
+ * @return string
+ */
 function _getUserNomUrl($fk_user)
 {
 	global $db;
@@ -164,4 +182,25 @@ function _getUserNomUrl($fk_user)
 		return $u->getNomUrl(1);
 	}
 	return '';
+}
+
+/**
+ * compte le nombre de massaction effectuées/ignorées
+ * @param string $table
+ * @param int $id
+ * @return int
+ */
+function _getCount($table, $id)
+{
+    global $db;
+    $sql = "select count(distinct rowid) as nb FROM ".MAIN_DB_PREFIX.$table." WHERE fk_massaction = ".$id;
+
+    $resql = $db->query($sql);
+    if ($resql)
+    {
+        $obj = $db->fetch_object($resql);
+
+        return $obj->nb;
+    }
+    else return 0;
 }
