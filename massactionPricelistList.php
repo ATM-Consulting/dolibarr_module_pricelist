@@ -156,7 +156,11 @@ print '<script>
 
 llxFooter();
 $db->close();
-
+/**
+ * genérer un getNomUrl pour les massactions
+ * @param int $id
+ * @return string
+ */
 function getNomUrlMassaction($id){
 	global $db;
 	$pricelistMassactions = new PricelistMassaction($db);
@@ -164,6 +168,11 @@ function getNomUrlMassaction($id){
 	return $pricelistMassactions->getNomURL();
 }
 
+/**
+ * genérer un getNomUrl pour les user
+ * @param int $fk_user
+ * @return string
+ */
 function _getUserNomUrl($fk_user)
 {
 	global $db;
@@ -175,6 +184,12 @@ function _getUserNomUrl($fk_user)
 	return '';
 }
 
+/**
+ * compte le nombre de massaction effectuées/ignorées
+ * @param string $table
+ * @param int $id
+ * @return int
+ */
 function _getCount($table, $id)
 {
     global $db;
